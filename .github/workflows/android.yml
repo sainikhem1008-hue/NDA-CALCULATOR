@@ -48,14 +48,18 @@ jobs:
       run: ./gradlew clean assembleDebug --no-daemon --stacktrace --info --warning-mode all
 
     - name: List build output files
-      run: ls -R NDA-CALCULATOR/app/build/outputs || echo "Build outputs folder not found"
+      run: |
+        echo "Listing APK/AAB outputs:"
+        find NDA-CALCULATOR/app/build/outputs -type f -maxdepth 8 -printf "%p\n" || echo "Build outputs folder not found"
 
-    - name: Upload APK artifact
+    - name: Upload APK artifact(s)
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
-        path: NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
-        if-no-files-found: error
+        name: app-debug-artifacts
+        path: |
+          NDA-CALCULATOR/app/build/outputs/apk/**/*.apk
+          NDA-CALCULATOR/app/build/outputs/**/*.aab
+        if-no-files-found: warn
 
 
 
