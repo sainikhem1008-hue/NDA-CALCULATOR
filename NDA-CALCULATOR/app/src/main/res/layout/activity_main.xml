@@ -83,9 +83,34 @@
 
         <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:layout_marginBottom="16dp" />
 
+        <TextView
+            android:id="@+id/tvCeilingWarning"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/accent_orange"
+            android:textSize="14sp"
+            android:visibility="gone"
+            android:layout_marginBottom="8dp"/>
+
         <Button android:id="@+id/btnCalculate" android:layout_width="match_parent" android:layout_height="56dp" android:background="@color/accent_green" android:text="🧮 Calculate Allowance" android:textColor="@color/white" android:textSize="16sp" android:textStyle="bold" />
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/llResults" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+            <Button android:id="@+id/btnSave" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:text="@string/save_record" android:background="@color/primary_blue" android:textColor="@color/white" />
+            <Button android:id="@+id/btnExport" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/export_pdf" android:background="@color/accent_orange" android:textColor="@color/white" />
+            <Button android:id="@+id/btnClear" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/clear_all" android:background="@color/accent_red" android:textColor="@color/white" />
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/llResults" android:layout_marginTop="12dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecords"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"/>
 
     </LinearLayout>
 </ScrollView>
