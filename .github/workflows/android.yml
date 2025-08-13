@@ -27,15 +27,15 @@ jobs:
         build-tools-version: 33.0.2
         ndk-version: 25.1.8937393
 
-    - name: Make gradlew executable
-      run: chmod +x ./NDA-CALCULATOR/gradlew
-    - name: Make gradle-wrapper.jar executable
-      run: chmod +x ./NDA-CALCULATOR/gradle/wrapper/gradle-wrapper.jar
-
+    - name: Install Gradle 7.6.3
+      run: |
+        wget -q https://services.gradle.org/distributions/gradle-7.6.3-bin.zip
+        unzip -q gradle-7.6.3-bin.zip -d $HOME/gradle
+        echo "$HOME/gradle/gradle-7.6.3/bin" >> $GITHUB_PATH
 
     - name: Build APK
       working-directory: NDA-CALCULATOR
-      run: ./gradlew assembleDebug
+      run: gradle assembleDebug
 
     - name: List build output files
       run: ls -R NDA-CALCULATOR/app/build/outputs || echo "Build outputs folder not found"
