@@ -27,6 +27,13 @@ jobs:
         build-tools-version: 33.0.2
         ndk-version: 25.1.8937393
 
+    - name: Accept Android SDK licenses
+      run: yes | sdkmanager --licenses
+
+    - name: Create local.properties
+      working-directory: NDA-CALCULATOR
+      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+
     - name: Make gradlew executable
       run: chmod +x ./NDA-CALCULATOR/gradlew
 
