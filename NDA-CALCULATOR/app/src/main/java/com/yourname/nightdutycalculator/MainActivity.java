@@ -12,6 +12,8 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
@@ -57,6 +59,16 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		initViews(); setupListeners(); loadRecords(); setDefaultValues();
+	}
+
+	@Override public boolean onCreateOptionsMenu(Menu menu) {
+		menu.add(0, 1, 0, "Exit");
+		return true;
+	}
+
+	@Override public boolean onOptionsItemSelected(MenuItem item) {
+		if (item.getItemId() == 1) { finishAffinity(); return true; }
+		return super.onOptionsItemSelected(item);
 	}
 
 	private void initViews() {
