@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">Night Duty Allowance</string>
+	<string name="add_date">Add date</string>
+	<string name="basic_pay">Basic pay (cap 43600)</string>
+	<string name="dearness_allowance">Dearness allowance (%)</string>
+	<string name="save_export">Save and export PDF</string>
+	<string name="total_night_hours">Total night hours</string>
+	<string name="nda_amount">NDA amount</string>
+</resources>

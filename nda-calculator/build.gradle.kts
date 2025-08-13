@@ -1,8 +1,1 @@
-// Root build.gradle.kts
-
-allprojects {
-	repositories {
-		google()
-		mavenCentral()
-	}
-}
+// Root build.gradle.kts intentionally minimal; repositories are defined in settings.gradle.kts
