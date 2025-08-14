@@ -45,7 +45,18 @@ jobs:
       env:
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
-      run: ./gradlew clean assembleDebug --no-daemon --stacktrace --info --warning-mode all
+      run: ./gradlew clean assembleDebug bundleDebug --no-daemon --stacktrace --info --warning-mode all
+
+    - name: Copy debug APK to canonical path (compat)
+      run: |
+        set -e
+        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+        if [ -n "$found" ]; then
+          echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
+          cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
+        else
+          echo "No debug APK found to copy"
+        fi
 
     - name: List build output files
       run: |
