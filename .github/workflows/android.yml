@@ -22,10 +22,12 @@ jobs:
 
     - name: Install Android SDK components
       run: |
-        echo y | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+        sdkmanager --version || true
+        yes | sdkmanager --licenses
+        yes | sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
-    - name: Accept Android SDK licenses
-      run: yes | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager --licenses
+    - name: Accept Android SDK licenses (redundant safety)
+      run: yes | sdkmanager --licenses
 
     - name: Create local.properties
       working-directory: NDA-CALCULATOR
@@ -76,7 +78,7 @@ jobs:
       with:
         name: app-debug-artifacts
         path: |
-          NDA-CALCULATOR/app/build/outputs/apk/**/*.apk
+          NDA-CALCULATOR/app/build/outputs/**/*.apk
           NDA-CALCULATOR/app/build/outputs/**/*.aab
         if-no-files-found: warn
 
