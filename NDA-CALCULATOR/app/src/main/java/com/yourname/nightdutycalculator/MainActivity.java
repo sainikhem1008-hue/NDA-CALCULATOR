@@ -103,6 +103,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 		btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
 		btnExport.setOnClickListener(v -> { vibrate(); shareSummaryText(); });
 		btnClear.setOnClickListener(v -> { vibrate(); clearAllRecords(); });
+		Button btnExit = findViewById(R.id.btnExit);
+		if (btnExit != null) btnExit.setOnClickListener(v -> { vibrate(); finishAffinity(); });
 
 		etBasicPay.addTextChangedListener(new TextWatcher() {
 			@Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Night Duty Calculator</string>
+    <string name="app_name">NDA CALCULATOR</string>
     <string name="calculate">Calculate Allowance</string>
     <string name="save_record">Save Record</string>
     <string name="export_pdf">Share Summary</string>

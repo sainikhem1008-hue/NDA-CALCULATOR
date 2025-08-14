@@ -102,6 +102,7 @@
             <Button android:id="@+id/btnSave" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:text="@string/save_record" android:background="@color/primary_blue" android:textColor="@color/white" />
             <Button android:id="@+id/btnExport" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/export_pdf" android:background="@color/accent_orange" android:textColor="@color/white" />
             <Button android:id="@+id/btnClear" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="@string/clear_all" android:background="@color/accent_red" android:textColor="@color/white" />
+            <Button android:id="@+id/btnExit" android:layout_width="0dp" android:layout_height="48dp" android:layout_weight="1" android:layout_marginStart="8dp" android:text="Exit" android:background="@color/primary_dark" android:textColor="@color/white" />
         </LinearLayout>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/llResults" android:layout_marginTop="12dp" />
