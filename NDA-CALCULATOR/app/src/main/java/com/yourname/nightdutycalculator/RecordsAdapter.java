@@ -1,5 +1,5 @@
 package com.yourname.nightdutycalculator;
-
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +41,14 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         } catch (Exception e) { holder.tvDate.setText(record.getDate()); }
         holder.tvTime.setText(record.getDutyFrom() + " - " + record.getDutyTo());
         holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
-        holder.tvType.setText(record.isNationalHoliday() ? "🎉 Holiday" : "📅 Regular");
+        if (record.isNationalHoliday()) {
+		holder.tvType.setText("🎉 Holiday");
+		holder.tvType.setTextColor(Color.parseColor("#27AE60")); // green
+	} else {
+		holder.tvType.setText("📅 Regular");
+		holder.tvType.setTextColor(Color.BLACK);
+        }
+        
         holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
         holder.btnDelete.setOnClickListener(v -> { if (deleteListener != null) deleteListener.onRecordDelete(record, position); });
     }
