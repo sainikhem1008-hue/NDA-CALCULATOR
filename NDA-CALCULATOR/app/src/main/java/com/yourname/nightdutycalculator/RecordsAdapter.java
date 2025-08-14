@@ -46,7 +46,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         if (record.isNationalHoliday()) {
             holder.tvType.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), R.color.accent_green));
         } else {
-            holder.tvType.setTextColor(0xFF000000);
+            holder.tvType.setTextColor(ContextCompat.getColor(holder.itemView.getContext(), android.R.color.black));
         }
         holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
         holder.btnDelete.setOnClickListener(v -> { if (deleteListener != null) deleteListener.onRecordDelete(record, position); });
