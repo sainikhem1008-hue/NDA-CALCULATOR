@@ -20,14 +20,22 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Install Android SDK components
+    - name: Prepare Android SDK (sdkmanager)
+      env:
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
       run: |
-        sdkmanager --version || true
-        yes | sdkmanager --licenses
-        yes | sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
-
-    - name: Accept Android SDK licenses (redundant safety)
-      run: yes | sdkmanager --licenses
+        set -e
+        SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
+        if [ ! -x "$SDKMANAGER" ]; then
+          echo "Installing Android cmdline-tools..."
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
+          curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
+          mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+        fi
+        "$SDKMANAGER" --version || true
+        yes | "$SDKMANAGER" --licenses
+        yes | "$SDKMANAGER" "platform-tools" "platforms;android-33" "build-tools;33.0.2"
 
     - name: Create local.properties
       working-directory: NDA-CALCULATOR
@@ -47,7 +55,7 @@ jobs:
       env:
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
-      run: ./gradlew clean assembleDebug bundleDebug --no-daemon --stacktrace --info --warning-mode all
+      run: ./gradlew clean :app:assembleDebug --no-daemon --stacktrace --info --warning-mode all
 
     - name: Copy debug APK to canonical path (compat)
       run: |
