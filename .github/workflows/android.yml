@@ -50,10 +50,18 @@ jobs:
     - name: Copy debug APK to canonical path (compat)
       run: |
         set -e
-        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+        # Prefer unsigned or regular debug APK if present
+        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
+        if [ -z "$found" ]; then
+          found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+        fi
         if [ -n "$found" ]; then
-          echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
-          cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
+          if [ "$found" != "NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
+            cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
+          else
+            echo "Canonical app-debug.apk already present"
+          fi
         else
           echo "No debug APK found to copy"
         fi
