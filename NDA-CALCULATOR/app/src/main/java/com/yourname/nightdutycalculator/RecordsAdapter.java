@@ -7,6 +7,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.core.content.ContextCompat;
+import android.graphics.Color;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -41,7 +43,13 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         } catch (Exception e) { holder.tvDate.setText(record.getDate()); }
         holder.tvTime.setText(record.getDutyFrom() + " - " + record.getDutyTo());
         holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
-        holder.tvType.setText(record.isNationalHoliday() ? "🎉 Holiday" : "📅 Regular");
+        if (record.isNationalHoliday()) {
+            holder.tvType.setText("🎉 Holiday");
+            holder.tvType.setTextColor(Color.parseColor("#27AE60")); // green
+        } else {
+            holder.tvType.setText("📅 Regular");
+            holder.tvType.setTextColor(Color.BLACK);
+        }
         holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
         holder.btnDelete.setOnClickListener(v -> { if (deleteListener != null) deleteListener.onRecordDelete(record, position); });
     }

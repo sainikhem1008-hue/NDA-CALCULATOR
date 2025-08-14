@@ -20,32 +20,65 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        api-level: 33
-        build-tools-version: 33.0.2
-        ndk-version: 25.1.8937393
+    - name: Install Android SDK components
+      run: |
+        echo y | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager "platform-tools" "platforms;android-33" "build-tools;33.0.2"
+
+    - name: Accept Android SDK licenses
+      run: yes | "$ANDROID_SDK_ROOT"/cmdline-tools/latest/bin/sdkmanager --licenses
+
+    - name: Create local.properties
+      working-directory: NDA-CALCULATOR
+      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
     - name: Make gradlew executable
       run: chmod +x ./NDA-CALCULATOR/gradlew
-    - name: Make gradle-wrapper.jar executable
-      run: chmod +x ./NDA-CALCULATOR/gradle/wrapper/gradle-wrapper.jar
 
+    - name: Show tool versions
+      working-directory: NDA-CALCULATOR
+      run: |
+        java -version
+        ./gradlew --version
 
     - name: Build APK
       working-directory: NDA-CALCULATOR
-      run: ./gradlew assembleDebug
+      env:
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
+      run: ./gradlew clean assembleDebug bundleDebug --no-daemon --stacktrace --info --warning-mode all
+
+    - name: Copy debug APK to canonical path (compat)
+      run: |
+        set -e
+        # Prefer unsigned or regular debug APK if present
+        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
+        if [ -z "$found" ]; then
+          found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+        fi
+        if [ -n "$found" ]; then
+          if [ "$found" != "NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
+            cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
+          else
+            echo "Canonical app-debug.apk already present"
+          fi
+        else
+          echo "No debug APK found to copy"
+        fi
 
     - name: List build output files
-      run: ls -R NDA-CALCULATOR/app/build/outputs || echo "Build outputs folder not found"
+      run: |
+        echo "Listing APK/AAB outputs:"
+        find NDA-CALCULATOR/app/build/outputs -type f -maxdepth 8 -printf "%p\n" || echo "Build outputs folder not found"
 
-    - name: Upload APK artifact
+    - name: Upload APK artifact(s)
       uses: actions/upload-artifact@v4
       with:
-        name: app-debug-apk
-        path: NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
-        if-no-files-found: error
+        name: app-debug-artifacts
+        path: |
+          NDA-CALCULATOR/app/build/outputs/apk/**/*.apk
+          NDA-CALCULATOR/app/build/outputs/**/*.aab
+        if-no-files-found: warn
 
 
 
