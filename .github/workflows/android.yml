@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-     env:
+    env:
       ANDROID_SDK_ROOT: $HOME/android-sdk
       ANDROID_HOME: $HOME/android-sdk
 
