@@ -44,11 +44,11 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         holder.tvTime.setText(record.getDutyFrom() + " - " + record.getDutyTo());
         holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
         if (record.isNationalHoliday()) {
-            holder.tvType.setText("🎉 Holiday");
+            holder.tvType.setText("🎉 National Holiday");
             holder.tvType.setTextColor(Color.parseColor("#27AE60")); // green
         } else {
             holder.tvType.setText("📅 Regular");
-            holder.tvType.setTextColor(Color.BLACK);
+            holder.tvType.setTextColor(Color.GREEN);
         }
         holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
         holder.btnDelete.setOnClickListener(v -> { if (deleteListener != null) deleteListener.onRecordDelete(record, position); });
