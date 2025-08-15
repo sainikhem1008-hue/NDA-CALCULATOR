@@ -30,21 +30,22 @@ jobs:
         echo "Installing Android cmdline-tools..."
         mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
         curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip -q /tmp/cmdtools.zip -d /tmp/cmdtools
+        unzip -q /tmp/cmdtools.zip -d /tmp
+        # Move the entire cmdline-tools folder to latest/
         mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-        mv /tmp/cmdtools/cmdline-tools/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
+        mv /tmp/cmdline-tools/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
         yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
         yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
     - name: Create local.properties
-      working-directory: NDA
+      working-directory: NDA-CALCULATOR
       run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
     - name: Make gradlew executable
-      run: chmod +x ./NDA/gradlew
+      run: chmod +x ./NDA-CALCULATOR/gradlew
 
     - name: Show tool versions
-      working-directory: NDA
+      working-directory: NDA-CALCULATOR
       run: |
         java -version
         ./gradlew --version
@@ -56,7 +57,7 @@ jobs:
         echo "$HOME/gradle/gradle-7.6.3/bin" >> $GITHUB_PATH
 
     - name: Build APK
-      working-directory: NDA
+      working-directory: NDA-CALCULATOR
       env:
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
@@ -65,14 +66,14 @@ jobs:
     - name: Copy debug APK to canonical path (compat)
       run: |
         set -e
-        found=$(ls -1 NDA/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
+        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
         if [ -z "$found" ]; then
-          found=$(ls -1 NDA/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+          found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
         fi
         if [ -n "$found" ]; then
-          if [ "$found" != "NDA/app/build/outputs/apk/debug/app-debug.apk" ]; then
-            echo "Copying $found to NDA/app/build/outputs/apk/debug/app-debug.apk"
-            cp "$found" NDA/app/build/outputs/apk/debug/app-debug.apk
+          if [ "$found" != "NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
+            cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
           else
             echo "Canonical app-debug.apk already present"
           fi
@@ -83,13 +84,13 @@ jobs:
     - name: List build output files
       run: |
         echo "Listing APK/AAB outputs:"
-        find NDA/app/build/outputs -type f -maxdepth 8 -print || echo "Build outputs folder not found"
+        find NDA-CALCULATOR/app/build/outputs -type f -maxdepth 8 -print || echo "Build outputs folder not found"
 
     - name: Upload APK and AAB artifacts
       uses: actions/upload-artifact@v4
       with:
         name: android-build-artifacts
         path: |
-          NDA/app/build/outputs/**/*.apk
-          NDA/app/build/outputs/**/*.aab
+          NDA-CALCULATOR/app/build/outputs/**/*.apk
+          NDA-CALCULATOR/app/build/outputs/**/*.aab
         if-no-files-found: warn
