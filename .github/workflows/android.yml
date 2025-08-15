@@ -24,16 +24,22 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Install Android SDK Command-line Tools
+    - name: Install Android SDK Command-line Tools (fixed structure)
       run: |
         set -e
         echo "Installing Android cmdline-tools..."
         mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
         curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-        unzip -q /tmp/cmdtools.zip -d /tmp
-        # Ensure clean 'latest' folder
-        rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-        mv /tmp/cmdline-tools "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+
+        # Create 'latest' dir and unzip directly into it
+        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+        unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+
+        # If Google nested it under cmdline-tools/, flatten it
+        if [ -d "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools" ]; then
+          mv "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
+          rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"
+        fi
 
         echo "Checking sdkmanager works..."
         "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --version
