@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 		etCeilingLimit = findViewById(R.id.etCeilingLimit);
 		etBasicPay = findViewById(R.id.etBasicPay);
 		etDearnessAllowance = findViewById(R.id.etDearnessAllowance);
-		cbNationalHoliday = findViewById(R.id.cbNationalHoliday,cbNationalHoliday.setTextColor(ContextCompat.getColor(this, R.color.accent_green));
+		cbNationalHoliday = findViewById(R.id.cbNationalHoliday);
+        cbNationalHoliday.setTextColor(ContextCompat.getColor(this, R.color.accent_green));
 		btnCalculate = findViewById(R.id.btnCalculate);
 		btnSave = findViewById(R.id.btnSave);
 		btnExport = findViewById(R.id.btnExport);
