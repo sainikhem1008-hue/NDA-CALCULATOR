@@ -83,7 +83,8 @@ jobs:
         else
           echo "No debug APK found to copy"
         fi
-
+    - name: Clean Gradle cache
+      run: ./gradlew clean
     - name: List build output files
       run: |
         echo "Listing APK/AAB outputs:"
