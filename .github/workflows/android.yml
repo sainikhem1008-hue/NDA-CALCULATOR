@@ -21,6 +21,10 @@ jobs:
       with:
         distribution: temurin
         java-version: 17
+    
+    - name: Prepare Android SDK (sdkmanager)
+      env:
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
       run: |
         set -e
         SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
