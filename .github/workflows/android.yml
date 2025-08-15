@@ -10,6 +10,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      ANDROID_SDK_ROOT: $HOME/android-sdk
+      ANDROID_HOME: $HOME/android-sdk
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -30,8 +34,12 @@ jobs:
           echo "Installing Android cmdline-tools..."
           mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
           curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
-          unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools"
-          mv "$ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          # Some archives nest directory; normalize path
+          if [ -d "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools" ]; then
+            mv "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
+          fi
         fi
         "$SDKMANAGER" --version || true
         yes | "$SDKMANAGER" --licenses
