@@ -31,9 +31,13 @@ jobs:
         mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
         curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
         unzip -q /tmp/cmdtools.zip -d /tmp
-        # Move the entire cmdline-tools folder to latest/
-        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-        mv /tmp/cmdline-tools/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
+        # Ensure clean 'latest' folder
+        rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+        mv /tmp/cmdline-tools "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+
+        echo "Checking sdkmanager works..."
+        "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --version
+
         yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
         yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
 
