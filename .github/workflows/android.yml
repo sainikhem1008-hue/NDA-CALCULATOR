@@ -2,12 +2,14 @@ name: Android Build
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
   pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     env:
       ANDROID_SDK_ROOT: $HOME/android-sdk
       ANDROID_HOME: $HOME/android-sdk
@@ -23,14 +25,18 @@ jobs:
         java-version: 17
 
     - name: Prepare Android SDK (sdkmanager)
+      env:
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
       run: |
         set -e
         SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
         if [ ! -x "$SDKMANAGER" ]; then
           echo "Installing Android cmdline-tools..."
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
           curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip
+          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
           unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools/latest"
+          # Some archives nest directory; normalize path
           if [ -d "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools" ]; then
             mv "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest" || true
           fi
@@ -54,18 +60,48 @@ jobs:
 
     - name: Build APK
       working-directory: NDA-CALCULATOR
+      env:
+        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
+        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
       run: ./gradlew clean :app:assembleDebug --no-daemon --stacktrace --info --warning-mode all
 
-    - name: List build outputs
+    - name: Copy debug APK to canonical path (compat)
       run: |
-        echo "Outputs:"
-        find NDA-CALCULATOR/app/build/outputs -type f -maxdepth 8 -printf "%p\n" || true
+        set -e
+        # Prefer unsigned or regular debug APK if present
+        found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
+        if [ -z "$found" ]; then
+          found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
+        fi
+        if [ -n "$found" ]; then
+          if [ "$found" != "NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk" ]; then
+            echo "Copying $found to NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk"
+            cp "$found" NDA-CALCULATOR/app/build/outputs/apk/debug/app-debug.apk
+          else
+            echo "Canonical app-debug.apk already present"
+          fi
+        else
+          echo "No debug APK found to copy"
+        fi
 
-    - name: Upload APK/AAB
+    - name: List build output files
+      run: |
+        echo "Listing APK/AAB outputs:"
+        find NDA-CALCULATOR/app/build/outputs -type f -maxdepth 8 -printf "%p\n" || echo "Build outputs folder not found"
+
+    - name: Upload APK artifact(s)
       uses: actions/upload-artifact@v4
       with:
-        name: app-build-artifacts
+        name: app-debug-artifacts
         path: |
           NDA-CALCULATOR/app/build/outputs/**/*.apk
           NDA-CALCULATOR/app/build/outputs/**/*.aab
         if-no-files-found: warn
+
+
+
+
+
+
+
+
