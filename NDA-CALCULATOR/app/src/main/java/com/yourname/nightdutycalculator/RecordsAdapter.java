@@ -44,7 +44,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         if (record.isNationalHoliday()) {
 		holder.tvType.setText("🎉 Holiday");
 		holder.tvType.setTextColor(Color.parseColor("#27AE60")); // green
-	} else {
+	    } else {
 		holder.tvType.setText("📅 Regular");
 		holder.tvType.setTextColor(Color.BLACK);
         }
