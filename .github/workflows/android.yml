@@ -9,6 +9,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+     env:
+      ANDROID_SDK_ROOT: $HOME/android-sdk
+      ANDROID_HOME: $HOME/android-sdk
+
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -17,12 +21,6 @@ jobs:
       with:
         distribution: temurin
         java-version: 17
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v2
-      with:
-        api-level: 33
-        build-tools-version: 33.0.2
-        ndk-version: 25.1.8937393
       run: |
         set -e
         SDKMANAGER="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager"
