@@ -78,10 +78,10 @@
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/dearness_allowance">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="38.0" />
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="55.0" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/accent_red" android:textStyle="bold" android:layout_marginBottom="16dp" />
+        <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/accent_green" android:textStyle="bold" android:layout_marginBottom="16dp" />
 
         <Button android:id="@+id/btnCalculate" android:layout_width="match_parent" android:layout_height="56dp" android:background="@color/accent_green" android:text="🧮 Calculate Allowance" android:textColor="@color/white" android:textSize="16sp" android:textStyle="bold" />
 
