@@ -23,7 +23,6 @@ jobs:
       with:
         distribution: temurin
         java-version: 17
-
     - name: Prepare Android SDK (sdkmanager)
       env:
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
@@ -64,7 +63,8 @@ jobs:
         ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
         ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
       run: ./gradlew clean :app:assembleDebug --no-daemon --stacktrace --info --warning-mode all
-
+    - name: Clean Gradle cache
+      run: ./gradlew clean
     - name: Copy debug APK to canonical path (compat)
       run: |
         set -e
