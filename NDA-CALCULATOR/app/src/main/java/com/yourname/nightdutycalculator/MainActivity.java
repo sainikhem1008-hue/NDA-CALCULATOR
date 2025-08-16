@@ -251,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         TextView tv = new TextView(this);
         tv.setText(label + " " + value);
         tv.setTextSize(16);
+        tv.setTextColor(getResources().getColor(R.color.dark_black));
+        tv.setPadding(0, 8, 0, 8);
         if (llResults != null) llResults.addView(tv);
     }
 
