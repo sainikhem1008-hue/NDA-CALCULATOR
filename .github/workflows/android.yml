@@ -60,12 +60,6 @@ jobs:
         java -version
         ./gradlew --version
 
-    - name: Install Gradle 7.6.3
-      run: |
-        wget -q https://services.gradle.org/distributions/gradle-7.6.3-bin.zip
-        unzip -q gradle-7.6.3-bin.zip -d $HOME/gradle
-        echo "$HOME/gradle/gradle-7.6.3/bin" >> $GITHUB_PATH
-
     - name: Build APK
       working-directory: NDA-CALCULATOR
       env:

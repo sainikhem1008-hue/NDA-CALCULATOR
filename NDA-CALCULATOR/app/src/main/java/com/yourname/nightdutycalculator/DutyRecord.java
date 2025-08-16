@@ -1,6 +1,12 @@
 package com.yourname.nightdutycalculator;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "duty_records")
 public class DutyRecord {
+    @PrimaryKey
+    private long id;
     private String date;
     private String dutyFrom;
     private String dutyTo;
@@ -13,7 +19,6 @@ public class DutyRecord {
     private double dearnessAllowance;
     private double nightDutyAllowance;
     private boolean isNationalHoliday;
-    private long id;
 
     public DutyRecord() { this.id = System.currentTimeMillis(); }
 
