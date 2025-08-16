@@ -1,0 +1,417 @@
+/workspace/NDA-CALCULATOR/app/src/main/AndroidManifest.xml:4: Warning: WRITE_EXTERNAL_STORAGE no longer provides write access when targeting Android 10, unless you use requestLegacyExternalStorage [ScopedStorage]
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ScopedStorage":
+   Scoped storage is enforced on Android 10+ (or Android 11+ if using
+   requestLegacyExternalStorage). In particular, WRITE_EXTERNAL_STORAGE will
+   no longer provide write access to all files; it will provide the equivalent
+   of READ_EXTERNAL_STORAGE instead.
+
+   As of Android 13, if you need to query or interact with MediaStore or media
+   files on the shared storage, you should be using instead one or more new
+   storage permissions:
+   * android.permission.READ_MEDIA_IMAGES
+   * android.permission.READ_MEDIA_VIDEO
+   * android.permission.READ_MEDIA_AUDIO
+
+   and then add maxSdkVersion="33" to the older permission. See the developer
+   guide for how to do this:
+   https://developer.android.com/about/versions/13/behavior-changes-13#granula
+   r-media-permissions
+
+   The MANAGE_EXTERNAL_STORAGE permission can be used to manage all files, but
+   it is rarely necessary and most apps on Google Play are not allowed to use
+   it. Most apps should instead migrate to use scoped storage. To modify or
+   delete files, apps should request write access from the user as described
+   at https://goo.gle/android-mediastore-createwriterequest.
+
+   To learn more, read these resources: Play policy:
+   https://goo.gle/policy-storage-help Allowable use cases:
+   https://goo.gle/policy-storage-usecases
+
+   https://goo.gle/android-storage-usecases
+
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:243: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+        addResultItem("Total Duty Hours:", String.format("%.2f hrs", currentCalculation.getTotalDutyHours()));
+                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:244: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+        addResultItem("Night Hours (22:00-00:00):", String.format("%.2f hrs", currentCalculation.getNightHours1()));
+                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:245: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+        addResultItem("Night Hours (00:00-06:00):", String.format("%.2f hrs", currentCalculation.getNightHours2()));
+                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:246: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+        addResultItem("Total Night Hours:", String.format("%.2f hrs", currentCalculation.getTotalNightHours()));
+                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:284: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+            document.add(new Paragraph("Total Night Hours: " + String.format("%.2f hrs", totalHours)));
+                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:292: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+                table.addCell(String.format("%.1f", record.getTotalNightHours()));
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/RecordsAdapter.java:43: Warning: Implicitly using the default locale is a common source of bugs: Use String.format(Locale, ...) instead [DefaultLocale]
+        holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "DefaultLocale":
+   Calling String#toLowerCase() or #toUpperCase() without specifying an
+   explicit locale is a common source of bugs. The reason for that is that
+   those methods will use the current locale on the user's device, and even
+   though the code appears to work correctly when you are developing the app,
+   it will fail in some locales. For example, in the Turkish locale, the
+   uppercase replacement for i is not I.
+
+   If you want the methods to just perform ASCII replacement, for example to
+   convert an enum name, call String#toUpperCase(Locale.US) instead. If you
+   really want to use the current locale, call
+   String#toUpperCase(Locale.getDefault()) instead.
+
+   https://developer.android.com/reference/java/util/Locale.html#default_locale
+
+/workspace/NDA-CALCULATOR/app/build.gradle:45: Warning: A newer version of androidx.core:core-ktx than 1.9.0 is available: 1.17.0 [GradleDependency]
+    implementation 'androidx.core:core-ktx:1.9.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:46: Warning: A newer version of androidx.appcompat:appcompat than 1.6.1 is available: 1.7.1 [GradleDependency]
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:47: Warning: A newer version of com.google.android.material:material than 1.8.0 is available: 1.12.0 [GradleDependency]
+    implementation 'com.google.android.material:material:1.8.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:48: Warning: A newer version of androidx.constraintlayout:constraintlayout than 2.1.4 is available: 2.2.1 [GradleDependency]
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:50: Warning: A newer version of androidx.recyclerview:recyclerview than 1.3.0 is available: 1.4.0 [GradleDependency]
+    implementation 'androidx.recyclerview:recyclerview:1.3.0'
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:53: Warning: A newer version of androidx.room:room-runtime than 2.5.0 is available: 2.7.2 [GradleDependency]
+    implementation "androidx.room:room-runtime:2.5.0"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:54: Warning: A newer version of androidx.room:room-compiler than 2.5.0 is available: 2.7.2 [GradleDependency]
+    kapt "androidx.room:room-compiler:2.5.0"
+         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:55: Warning: A newer version of androidx.room:room-ktx than 2.5.0 is available: 2.7.2 [GradleDependency]
+    implementation "androidx.room:room-ktx:2.5.0"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:58: Warning: A newer version of androidx.lifecycle:lifecycle-viewmodel-ktx than 2.6.1 is available: 2.9.2 [GradleDependency]
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/build.gradle:59: Warning: A newer version of androidx.lifecycle:lifecycle-runtime-ktx than 2.6.1 is available: 2.9.2 [GradleDependency]
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.6.1"
+                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "GradleDependency":
+   This detector looks for usages of libraries where the version you are using
+   is not the current stable release. Using older versions is fine, and there
+   are cases where you deliberately want to stick with an older version.
+   However, you may simply not be aware that a more recent version is
+   available, and that is what this lint check helps find.
+
+/workspace/NDA-CALCULATOR/app/src/main/AndroidManifest.xml:17: Warning: Expecting android:screenOrientation="unspecified" or "fullSensor" for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices [LockedOrientationActivity]
+        <activity android:name=".MainActivity" android:exported="true" android:screenOrientation="portrait">
+                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "LockedOrientationActivity":
+   The <activity> element should not be locked to any orientation so that
+   users can take advantage of the multi-window environments and larger
+   screens available on Android. To fix the issue, consider declaring the
+   corresponding activity element with `screenOrientation="unspecified"or
+   "fullSensor"` attribute.
+
+   https://developer.android.com/topic/arc/window-management
+
+/home/ubuntu/.gradle/caches/modules-2/files-2.1/org.bouncycastle/bcpkix-jdk15on/1.70/f81e5af49571a9d5a109a88f239a73ce87055417/bcpkix-jdk15on-1.70.jar: Warning: checkClientTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+/home/ubuntu/.gradle/caches/modules-2/files-2.1/org.bouncycastle/bcpkix-jdk15on/1.70/f81e5af49571a9d5a109a88f239a73ce87055417/bcpkix-jdk15on-1.70.jar: Warning: checkClientTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+/home/ubuntu/.gradle/caches/modules-2/files-2.1/org.bouncycastle/bcpkix-jdk15on/1.70/f81e5af49571a9d5a109a88f239a73ce87055417/bcpkix-jdk15on-1.70.jar: Warning: checkServerTrusted is empty, which could cause insecure network traffic due to trusting arbitrary TLS/SSL certificates presented by peers [TrustAllX509TrustManager]
+
+   Explanation for issues of type "TrustAllX509TrustManager":
+   This check looks for X509TrustManager implementations whose
+   checkServerTrusted or checkClientTrusted methods do nothing (thus trusting
+   any certificate chain) which could result in insecure network traffic
+   caused by trusting arbitrary TLS/SSL certificates presented by peers.
+
+   https://goo.gle/TrustAllX509TrustManager
+
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:263: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+        if (adapter != null) adapter.notifyDataSetChanged();
+                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:307: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+            records.clear(); saveRecordsToPrefs(); if (adapter!=null) adapter.notifyDataSetChanged(); if (llResults!=null) llResults.removeAllViews(); currentCalculation = null; Toast.makeText(this, "All records cleared", Toast.LENGTH_SHORT).show();
+                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:319: Warning: It will always be more efficient to use more specific change events if you can. Rely on notifyDataSetChanged as a last resort. [NotifyDataSetChanged]
+        if (loadedRecords != null) { records.clear(); records.addAll(loadedRecords); Collections.sort(records, (a, b) -> b.getDate().compareTo(a.getDate())); if (adapter!=null) adapter.notifyDataSetChanged(); }
+                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "NotifyDataSetChanged":
+   The RecyclerView adapter's onNotifyDataSetChanged method does not specify
+   what about the data set has changed, forcing any observers to assume that
+   all existing items and structure may no longer be valid. `LayoutManager`s
+   will be forced to fully rebind and relayout all visible views.
+
+/workspace/NDA-CALCULATOR/app/src/main/res/values/themes.xml:14: Warning: Unnecessary; SDK_INT is always >= 21 [ObsoleteSdkInt]
+        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+                                            ~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "ObsoleteSdkInt":
+   This check flags version checks that are not necessary, because the
+   minSdkVersion (or surrounding known API level) is already at least as high
+   as the version checked for.
+
+   Similarly, it also looks for resources in -vNN folders, such as values-v14
+   where the version qualifier is less than or equal to the minSdkVersion,
+   where the contents should be merged into the best folder.
+
+/workspace/NDA-CALCULATOR/app/build.gradle:54: Warning: This library supports using KSP instead of kapt, which greatly improves performance. Learn more: https://developer.android.com/studio/build/migrate-to-ksp [KaptUsageInsteadOfKsp]
+    kapt "androidx.room:room-compiler:2.5.0"
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "KaptUsageInsteadOfKsp":
+   KSP is a more efficient replacement for kapt. For libraries that support
+   both, KSP should be used to improve build times.
+
+   https://developer.android.com/studio/build/migrate-to-ksp
+
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:63: Warning: Set android:baselineAligned="false" on this element for better performance [DisableBaselineAlignment]
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+         ~~~~~~~~~~~~
+
+   Explanation for issues of type "DisableBaselineAlignment":
+   When a LinearLayout is used to distribute the space proportionally between
+   nested layouts, the baseline alignment property should be turned off to
+   make the layout computation faster.
+
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:6: Warning: Possible overdraw: Root element paints background @color/light_green with a theme that also paints a background (inferred theme is @style/Theme.Material3.DayNight) [Overdraw]
+    android:background="@color/light_green">
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "Overdraw":
+   If you set a background drawable on a root view, then you should use a
+   custom theme where the theme background is null. Otherwise, the theme
+   background will be painted first, only to have your custom background
+   completely cover it; this is called "overdraw".
+
+   NOTE: This detector relies on figuring out which layouts are associated
+   with which activities based on scanning the Java code, and it's currently
+   doing that using an inexact pattern matching algorithm. Therefore, it can
+   incorrectly conclude which activity the layout is associated with and then
+   wrongly complain that a background-theme is hidden.
+
+   If you want your custom background on multiple pages, then you should
+   consider making a custom theme with your custom background and just using
+   that theme instead of a root element background.
+
+   Of course it's possible that your custom drawable is translucent and you
+   want it to be mixed with the background. However, you will get better
+   performance if you pre-mix the background with your drawable and use that
+   resulting image or color as a custom theme background instead.
+
+/workspace/NDA-CALCULATOR/app/src/main/res/xml/backup_rules.xml:2: Warning: The resource R.xml.backup_rules appears to be unused [UnusedResources]
+<full-backup-content>
+^
+/workspace/NDA-CALCULATOR/app/src/main/res/values/colors.xml:9: Warning: The resource R.color.border_gray appears to be unused [UnusedResources]
+    <color name="border_gray">#e9ecef</color>
+           ~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/xml/data_extraction_rules.xml:2: Warning: The resource R.xml.data_extraction_rules appears to be unused [UnusedResources]
+<data-extraction-rules>
+^
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:3: Warning: The resource R.string.calculate appears to be unused [UnusedResources]
+    <string name="calculate">Calculate Allowance</string>
+            ~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:4: Warning: The resource R.string.save_record appears to be unused [UnusedResources]
+    <string name="save_record">Save Record</string>
+            ~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:5: Warning: The resource R.string.export_pdf appears to be unused [UnusedResources]
+    <string name="export_pdf">Export PDF</string>
+            ~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:6: Warning: The resource R.string.clear_all appears to be unused [UnusedResources]
+    <string name="clear_all">Clear All</string>
+            ~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:13: Warning: The resource R.string.national_holiday appears to be unused [UnusedResources]
+    <string name="national_holiday">National Holiday</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:14: Warning: The resource R.string.total_duty_hours appears to be unused [UnusedResources]
+    <string name="total_duty_hours">Total Duty Hours</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:15: Warning: The resource R.string.night_hours_22_00 appears to be unused [UnusedResources]
+    <string name="night_hours_22_00">Night Hours (22:00-00:00)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:16: Warning: The resource R.string.night_hours_00_06 appears to be unused [UnusedResources]
+    <string name="night_hours_00_06">Night Hours (00:00-06:00)</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:17: Warning: The resource R.string.total_night_hours appears to be unused [UnusedResources]
+    <string name="total_night_hours">Total Night Hours</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:18: Warning: The resource R.string.effective_basic_pay appears to be unused [UnusedResources]
+    <string name="effective_basic_pay">Effective Basic Pay</string>
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:19: Warning: The resource R.string.night_allowance appears to be unused [UnusedResources]
+    <string name="night_allowance">Night Duty Allowance</string>
+            ~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "UnusedResources":
+   Unused resources make applications larger and slow down builds.
+
+
+   The unused resource check can ignore tests. If you want to include
+   resources that are only referenced from tests, consider packaging them in a
+   test source set instead.
+
+   You can include test sources in the unused resource check by setting the
+   system property lint.unused-resources.include-tests =true, and to exclude
+   them (usually for performance reasons), use
+   lint.unused-resources.exclude-tests =true.
+   ,
+
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:15: Warning: Replace "-" with an "en dash" character (–, &#8211;) ? [TypographyDashes]
+    <string name="night_hours_22_00">Night Hours (22:00-00:00)</string>
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/values/strings.xml:16: Warning: Replace "-" with an "en dash" character (–, &#8211;) ? [TypographyDashes]
+    <string name="night_hours_00_06">Night Hours (00:00-06:00)</string>
+                                     ~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "TypographyDashes":
+   The "n dash" (u2013, &#8211;) and the "m dash" (u2014, &#8212;) characters
+   are used for ranges (n dash) and breaks (m dash). Using these instead of
+   plain hyphens can make text easier to read and your application will look
+   more polished.
+
+   https://en.wikipedia.org/wiki/Dash
+
+/workspace/NDA-CALCULATOR/app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml:2: Warning: The application adaptive icon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+/workspace/NDA-CALCULATOR/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml:2: Warning: The application adaptive roundIcon is missing a monochrome tag [MonochromeLauncherIcon]
+<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+^
+
+   Explanation for issues of type "MonochromeLauncherIcon":
+   If android:roundIcon and android:icon are both in your manifest, you must
+   either remove the reference to android:roundIcon if it is not needed; or,
+   supply the monochrome icon in the drawable defined by the android:roundIcon
+   and android:icon attribute.
+
+   For example, if android:roundIcon and android:icon are both in the
+   manifest, a launcher might choose to use android:roundIcon over
+   android:icon to display the adaptive app icon. Therefore, your themed
+   application iconwill not show if your monochrome attribute is not also
+   specified in android:roundIcon.
+
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:97: Warning: Buttons in button bars should be borderless; use style="?android:attr/buttonBarButtonStyle" (and ?android:attr/buttonBarStyle on the parent) [ButtonStyle]
+            <Button
+             ~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:107: Warning: Buttons in button bars should be borderless; use style="?android:attr/buttonBarButtonStyle" (and ?android:attr/buttonBarStyle on the parent) [ButtonStyle]
+            <Button
+             ~~~~~~
+
+   Explanation for issues of type "ButtonStyle":
+   Button bars typically use a borderless style for the buttons. Set the
+   style="?android:attr/buttonBarButtonStyle" attribute on each of the
+   buttons, and set style="?android:attr/buttonBarStyle" on the parent layout
+
+   https://material.io/components/dialogs/
+
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:117: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+            if (basicPay > ceilingLimit) { if (tvCeilingWarning != null) { tvCeilingWarning.setVisibility(View.VISIBLE); tvCeilingWarning.setText("⚠ Using ceiling limit ₹" + decimalFormat.format(ceilingLimit)); } }
+                                                                                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:117: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+            if (basicPay > ceilingLimit) { if (tvCeilingWarning != null) { tvCeilingWarning.setVisibility(View.VISIBLE); tvCeilingWarning.setText("⚠ Using ceiling limit ₹" + decimalFormat.format(ceilingLimit)); } }
+                                                                                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:125: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        etDutyFrom.setText("22:00");
+                           ~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:126: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+        etDutyTo.setText("00:00");
+                         ~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/MainActivity.java:252: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        tv.setText(label + " " + value);
+                   ~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/RecordsAdapter.java:42: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.tvTime.setText(record.getDutyFrom() + " - " + record.getDutyTo());
+                              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/RecordsAdapter.java:45: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+  holder.tvType.setText("🎉 Holiday");
+                        ~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/RecordsAdapter.java:48: Warning: String literal in setText can not be translated. Use Android resources instead. [SetTextI18n]
+  holder.tvType.setText("📅 Regular");
+                        ~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/java/com/yourname/nightdutycalculator/RecordsAdapter.java:52: Warning: Do not concatenate text displayed with setText. Use resource string with placeholders. [SetTextI18n]
+        holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "SetTextI18n":
+   When calling TextView#setText
+   * Never call Number#toString() to format numbers; it will not handle
+   fraction separators and locale-specific digits properly. Consider using
+   String#format with proper format specifications (%d or %f) instead.
+   * Do not pass a string literal (e.g. "Hello") to display text. Hardcoded
+   text can not be properly translated to other languages. Consider using
+   Android resource strings instead.
+   * Do not build messages by concatenating text chunks. Such messages can not
+   be properly translated.
+
+   https://developer.android.com/guide/topics/resources/localization.html
+
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:31: Warning: Hardcoded string "🌙 Night Duty Calculator", should use @string resource [HardcodedText]
+                    android:text="🌙 Night Duty Calculator"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:40: Warning: Hardcoded string "Calculate and track your allowances", should use @string resource [HardcodedText]
+                    android:text="Calculate and track your allowances"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:73: Warning: Hardcoded string "43600", should use @string resource [HardcodedText]
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCeilingLimit" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" />
+                                                                                                                                                                                                          ~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:77: Warning: Hardcoded string "43600", should use @string resource [HardcodedText]
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBasicPay" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" />
+                                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:81: Warning: Hardcoded string "55.0", should use @string resource [HardcodedText]
+            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="55.0" />
+                                                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:84: Warning: Hardcoded string "🎉 National Holiday", should use @string resource [HardcodedText]
+        <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/accent_orange" android:textStyle="bold" android:layout_marginBottom="16dp" />
+                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:86: Warning: Hardcoded string "🧮 Calculate Allowance", should use @string resource [HardcodedText]
+        <Button android:id="@+id/btnCalculate" android:layout_width="match_parent" android:layout_height="56dp" android:background="@color/accent_green" android:text="🧮 Calculate Allowance" android:textColor="@color/white" android:textSize="16sp" android:textStyle="bold" />
+                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:104: Warning: Hardcoded string "💾 Save", should use @string resource [HardcodedText]
+                android:text="💾 Save"
+                ~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:114: Warning: Hardcoded string "📄 Export PDF", should use @string resource [HardcodedText]
+                android:text="📄 Export PDF"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/activity_main.xml:125: Warning: Hardcoded string "🗑️ Clear All", should use @string resource [HardcodedText]
+            android:text="🗑️ Clear All"
+            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:32: Warning: Hardcoded string "01/01/2024", should use @string resource [HardcodedText]
+                    android:text="01/01/2024"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:40: Warning: Hardcoded string "📅 Regular", should use @string resource [HardcodedText]
+                    android:text="📅 Regular"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:49: Warning: Hardcoded string "22:00 - 00:00", should use @string resource [HardcodedText]
+                android:text="22:00 - 00:00"
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:65: Warning: Hardcoded string "2.0 hrs", should use @string resource [HardcodedText]
+                    android:text="2.0 hrs"
+                    ~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:73: Warning: Hardcoded string "₹500.00", should use @string resource [HardcodedText]
+                    android:text="₹500.00"
+                    ~~~~~~~~~~~~~~~~~~~~~~
+/workspace/NDA-CALCULATOR/app/src/main/res/layout/item_record.xml:88: Warning: Hardcoded string "🗑", should use @string resource [HardcodedText]
+            android:text="🗑"
+            ~~~~~~~~~~~~~~~~~
+
+   Explanation for issues of type "HardcodedText":
+   Hardcoding text attributes directly in layout files is bad for several
+   reasons:
+
+   * When creating configuration variations (for example for landscape or
+   portrait) you have to repeat the actual text (and keep it up to date when
+   making changes)
+
+   * The application cannot be translated to other languages by just adding
+   new translations for existing string resources.
+
+   There are quickfixes to automatically extract this hardcoded string into a
+   resource lookup.
+
+0 errors, 74 warnings
