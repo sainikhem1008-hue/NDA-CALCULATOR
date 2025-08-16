@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:ns1="http://schemas.android.com/tools">
+    <color name="accent_green">#27ae60</color>
+    <color name="accent_orange">#f39c12</color>
+    <color name="accent_red">#e74c3c</color>
+    <color name="black">#000000</color>
+    <color name="border_gray">#e9ecef</color>
+    <color name="dark_gray">#333333</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
+    <color name="light_blue">#E3F2FD</color>
+    <color name="light_blue_border">#BBDEFB</color>
+    <color name="light_gray">#f8f9fa</color>
+    <color name="light_green">#e8f5e8</color>
+    <color name="primary_blue">#3498db</color>
+    <color name="primary_dark">#2c3e50</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">Night Duty Calculator</string>
+    <string name="basic_pay">Basic Pay (₹)</string>
+    <string name="calculate">Calculate Allowance</string>
+    <string name="ceiling_limit">Ceiling Limit (₹)</string>
+    <string name="clear_all">Clear All</string>
+    <string name="dearness_allowance">Dearness Allowance (%)</string>
+    <string name="duty_date">Duty Date</string>
+    <string name="duty_from">From Time</string>
+    <string name="duty_to">To Time</string>
+    <string name="effective_basic_pay">Effective Basic Pay</string>
+    <string name="export_pdf">Export PDF</string>
+    <string name="national_holiday">National Holiday</string>
+    <string name="night_allowance">Night Duty Allowance</string>
+    <string name="night_hours_00_06">Night Hours (00:00-06:00)</string>
+    <string name="night_hours_22_00">Night Hours (22:00-00:00)</string>
+    <string name="save_record">Save Record</string>
+    <string name="total_duty_hours">Total Duty Hours</string>
+    <string name="total_night_hours">Total Night Hours</string>
+    <style name="CustomTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/light_blue</item>
+        <item name="boxStrokeColor">@color/light_blue_border</item>
+        <item name="hintTextColor">@color/black</item>
+        <item name="android:textColorHint">@color/black</item>
+    </style>
+    <style name="Theme.Material3.DayNight" parent="Theme.Material3.DayNight.NoActionBar">
+        
+        <item name="colorPrimary">@color/primary_blue</item>
+        <item name="colorPrimaryVariant">@color/primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        
+        <item name="colorSecondary">@color/accent_green</item>
+        <item name="colorSecondaryVariant">@color/accent_orange</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <item name="android:statusBarColor" ns1:targetApi="l">?attr/colorPrimaryVariant</item>
+        
+        <item name="android:windowBackground">@color/white</item>
+        <item name="android:textColorPrimary">@color/black</item>
+        <item name="android:textColorSecondary">@color/black</item>
+        <item name="android:editTextColor">@color/black</item>
+        <item name="android:textColorHint">@color/black</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="colorOnBackground">@color/black</item>
+        <item name="android:textColor">@color/black</item>
+    </style>
+</resources>

@@ -8,4 +8,9 @@
     <color name="light_green">#e8f5e8</color>
     <color name="border_gray">#e9ecef</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="dark_gray">#333333</color>
+    <color name="light_blue">#E3F2FD</color>
+    <color name="light_blue_border">#BBDEFB</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>

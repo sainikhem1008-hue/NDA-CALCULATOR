@@ -30,7 +30,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
-import com.itextpdf.layout.property.TextAlignment;
+import com.itextpdf.layout.properties.TextAlignment;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.reflect.Type;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
     private CheckBox cbNationalHoliday;
-    private Button btnCalculate, btnSave, btnExport, btnClear;
+    private Button btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
     private RecyclerView rvRecords;
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
         btnClear = findViewById(R.id.btnClear);
+        btnExit = findViewById(R.id.btnExit);
         llResults = findViewById(R.id.llResults);
         tvCeilingWarning = findViewById(R.id.tvCeilingWarning);
         rvRecords = findViewById(R.id.rvRecords);
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
         btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
         btnClear.setOnClickListener(v -> { vibrate(); clearAllRecords(); });
+        btnExit.setOnClickListener(v -> { vibrate(); exitApp(); });
 
         etBasicPay.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -268,8 +270,18 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         if (records.isEmpty()) { Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show(); return; }
         try {
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String fileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date()) + ".pdf";
+            String baseFileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
+            String fileName = baseFileName + ".pdf";
             File pdfFile = new File(downloadsDir, fileName);
+            
+            // Handle existing files by adding a counter
+            int counter = 1;
+            while (pdfFile.exists()) {
+                fileName = baseFileName + "_(" + counter + ").pdf";
+                pdfFile = new File(downloadsDir, fileName);
+                counter++;
+            }
+            
             PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
@@ -298,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
             Intent intent = new Intent(Intent.ACTION_VIEW); intent.setDataAndType(pdfUri, "application/pdf"); intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Open PDF"));
-            Toast.makeText(this, "PDF exported to Downloads folder", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "PDF exported: " + fileName, Toast.LENGTH_LONG).show();
         } catch (Exception e) { Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_LONG).show(); e.printStackTrace(); }
     }
 
@@ -320,4 +332,16 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
     }
 
     private void saveRecordsToPrefs() { String recordsJson = gson.toJson(records); sharedPreferences.edit().putString("records", recordsJson).apply(); }
+    
+    private void exitApp() {
+        new AlertDialog.Builder(this)
+            .setTitle("Exit App")
+            .setMessage("Are you sure you want to exit the Night Duty Calculator?")
+            .setPositiveButton("Yes", (dialog, which) -> {
+                finishAffinity(); // Closes all activities
+                System.exit(0);   // Completely exits the app
+            })
+            .setNegativeButton("No", null)
+            .show();
+    }
 }
