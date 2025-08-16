@@ -6,7 +6,7 @@ buildscript {
     }
     dependencies {
         classpath "com.android.tools.build:gradle:7.4.2"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10"
     }
 }
 
@@ -14,5 +14,17 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+    
+    // Ensure consistent JVM target across all projects
+    tasks.withType(JavaCompile) {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+    
+    tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile) {
+        kotlinOptions {
+            jvmTarget = "17"
+        }
     }
 }
