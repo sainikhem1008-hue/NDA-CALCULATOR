@@ -3,7 +3,9 @@ local
 color accent_green
 color accent_orange
 color accent_red
+color black
 color border_gray
+color dark_gray
 color ic_launcher_background
 color light_gray
 color light_green
@@ -14,6 +16,7 @@ drawable ic_launcher_foreground
 id btnCalculate
 id btnClear
 id btnDelete
+id btnExit
 id btnExport
 id btnSave
 id cbNationalHoliday

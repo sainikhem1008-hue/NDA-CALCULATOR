@@ -1307,6 +1307,7 @@ color background_floating_material_dark
 color background_floating_material_light
 color background_material_dark
 color background_material_light
+color black
 color border_gray
 color bright_foreground_disabled_material_dark
 color bright_foreground_disabled_material_light
@@ -1320,6 +1321,7 @@ color cardview_dark_background
 color cardview_light_background
 color cardview_shadow_end_color
 color cardview_shadow_start_color
+color dark_gray
 color design_bottom_navigation_shadow_color
 color design_box_stroke_color
 color design_dark_default_color_background
@@ -2906,6 +2908,7 @@ id bounceStart
 id btnCalculate
 id btnClear
 id btnDelete
+id btnExit
 id btnExport
 id btnSave
 id buttonPanel

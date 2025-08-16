@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
     private CheckBox cbNationalHoliday;
-    private Button btnCalculate, btnSave, btnExport, btnClear;
+    private Button btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
     private RecyclerView rvRecords;
@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
         btnClear = findViewById(R.id.btnClear);
+        btnExit = findViewById(R.id.btnExit);
         llResults = findViewById(R.id.llResults);
         tvCeilingWarning = findViewById(R.id.tvCeilingWarning);
         rvRecords = findViewById(R.id.rvRecords);
@@ -97,6 +98,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
         btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
         btnClear.setOnClickListener(v -> { vibrate(); clearAllRecords(); });
+        btnExit.setOnClickListener(v -> { vibrate(); exitApp(); });
 
         etBasicPay.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -320,4 +322,16 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
     }
 
     private void saveRecordsToPrefs() { String recordsJson = gson.toJson(records); sharedPreferences.edit().putString("records", recordsJson).apply(); }
+    
+    private void exitApp() {
+        new AlertDialog.Builder(this)
+            .setTitle("Exit App")
+            .setMessage("Are you sure you want to exit the Night Duty Calculator?")
+            .setPositiveButton("Yes", (dialog, which) -> {
+                finishAffinity(); // Closes all activities
+                System.exit(0);   // Completely exits the app
+            })
+            .setNegativeButton("No", null)
+            .show();
+    }
 }
