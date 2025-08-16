@@ -15,4 +15,6 @@
     <color name="ic_launcher_background">#FFFFFF</color>
     <color name="header_blue">#2196F3</color>
     <color name="dark_black">#000000</color>
+    <color name="option_green">#4CAF50</color>
+    <color name="light_option_green">#E8F5E8</color>
 </resources>

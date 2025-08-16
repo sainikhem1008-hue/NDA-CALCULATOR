@@ -46,7 +46,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements RecordsAdapter.OnRecordDeleteListener {
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
-    private CheckBox cbNationalHoliday;
+    private TextInputEditText etLeaveFrom, etLeaveTo, etLeaveType;
+    private CheckBox cbNationalHoliday, cbWeeklyRest;
     private MaterialButton btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
@@ -73,6 +74,10 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etBasicPay = findViewById(R.id.etBasicPay);
         etDearnessAllowance = findViewById(R.id.etDearnessAllowance);
         cbNationalHoliday = findViewById(R.id.cbNationalHoliday);
+        cbWeeklyRest = findViewById(R.id.cbWeeklyRest);
+        etLeaveFrom = findViewById(R.id.etLeaveFrom);
+        etLeaveTo = findViewById(R.id.etLeaveTo);
+        etLeaveType = findViewById(R.id.etLeaveType);
         btnCalculate = findViewById(R.id.btnCalculate);
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
@@ -94,6 +99,9 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etDutyDate.setOnClickListener(v -> showDatePicker());
         etDutyFrom.setOnClickListener(v -> showTimePicker(etDutyFrom));
         etDutyTo.setOnClickListener(v -> showTimePicker(etDutyTo));
+        etLeaveFrom.setOnClickListener(v -> showDatePicker(etLeaveFrom));
+        etLeaveTo.setOnClickListener(v -> showDatePicker(etLeaveTo));
+        etLeaveType.setOnClickListener(v -> showLeaveTypeDialog());
         btnCalculate.setOnClickListener(v -> { vibrate(); calculateNightDuty(); });
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
         btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
@@ -130,13 +138,35 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
     }
 
     private void showDatePicker() {
+        showDatePicker(etDutyDate);
+    }
+
+    private void showDatePicker(TextInputEditText editText) {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            etDutyDate.setText(sdf.format(calendar.getTime()));
+            editText.setText(sdf.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
+    }
+
+    private void showLeaveTypeDialog() {
+        String[] leaveTypes = {
+            getString(R.string.casual_leave),
+            getString(R.string.sick_leave),
+            getString(R.string.earned_leave),
+            getString(R.string.compensatory_off),
+            getString(R.string.other_leave)
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Type of Leave")
+               .setItems(leaveTypes, (dialog, which) -> {
+                   etLeaveType.setText(leaveTypes[which]);
+               })
+               .setNegativeButton("Cancel", null)
+               .show();
     }
 
     private void showTimePicker(TextInputEditText editText) {
@@ -157,6 +187,10 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double ceilingLimit = Double.parseDouble(etCeilingLimit.getText().toString());
             double dearnessAllowance = Double.parseDouble(etDearnessAllowance.getText().toString());
             boolean isNationalHoliday = cbNationalHoliday.isChecked();
+            boolean isWeeklyRest = cbWeeklyRest.isChecked();
+            String leaveFrom = etLeaveFrom.getText().toString();
+            String leaveTo = etLeaveTo.getText().toString();
+            String leaveType = etLeaveType.getText().toString();
 
             if (dutyDate.isEmpty() || dutyFrom.isEmpty() || dutyTo.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -205,6 +239,10 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             currentCalculation.setDearnessAllowance(dearnessAllowance);
             currentCalculation.setNightDutyAllowance(nightDutyAllowance);
             currentCalculation.setNationalHoliday(isNationalHoliday);
+            currentCalculation.setWeeklyRest(isWeeklyRest);
+            currentCalculation.setLeaveFrom(leaveFrom);
+            currentCalculation.setLeaveTo(leaveTo);
+            currentCalculation.setLeaveType(leaveType);
 
             displayResults();
         } catch (NumberFormatException e) {
@@ -247,6 +285,18 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         addResultItem("Night Hours (00:00-06:00):", String.format("%.2f hrs", currentCalculation.getNightHours2()));
         addResultItem("Total Night Hours:", String.format("%.2f hrs", currentCalculation.getTotalNightHours()));
         addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
+        
+        // Display weekly rest and leave information if available
+        if (currentCalculation.isWeeklyRest()) {
+            addResultItem("Weekly Rest:", "✅ Applied");
+        }
+        
+        if (currentCalculation.getLeaveFrom() != null && !currentCalculation.getLeaveFrom().isEmpty()) {
+            addResultItem("Leave Period:", currentCalculation.getLeaveFrom() + " to " + currentCalculation.getLeaveTo());
+            if (currentCalculation.getLeaveType() != null && !currentCalculation.getLeaveType().isEmpty()) {
+                addResultItem("Leave Type:", currentCalculation.getLeaveType());
+            }
+        }
     }
 
     private void addResultItem(String label, String value) {
@@ -288,23 +338,48 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             Document document = new Document(pdfDoc);
             document.add(new Paragraph("🌙 Night Duty Allowance Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
             document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
-            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0;
-            for (DutyRecord record : records) { totalAllowance += record.getNightDutyAllowance(); totalHours += record.getTotalNightHours(); if (record.isNationalHoliday()) holidayCount++; else regularCount++; }
+            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0; int weeklyRestCount = 0; int leaveCount = 0;
+            for (DutyRecord record : records) { 
+                totalAllowance += record.getNightDutyAllowance(); 
+                totalHours += record.getTotalNightHours(); 
+                if (record.isNationalHoliday()) holidayCount++; 
+                else if (record.isWeeklyRest()) weeklyRestCount++;
+                else regularCount++; 
+                if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) leaveCount++;
+            }
             document.add(new Paragraph("\nSummary:").setFontSize(16));
             document.add(new Paragraph("Total Records: " + records.size()));
             document.add(new Paragraph("Regular Days: " + regularCount));
             document.add(new Paragraph("National Holidays: " + holidayCount));
+            document.add(new Paragraph("Weekly Rest Days: " + weeklyRestCount));
+            document.add(new Paragraph("Leave Records: " + leaveCount));
             document.add(new Paragraph("Total Night Hours: " + String.format("%.2f hrs", totalHours)));
             document.add(new Paragraph("Total Allowance: ₹" + decimalFormat.format(totalAllowance)));
-            Table table = new Table(6);
-            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Allowance");
+            Table table = new Table(7);
+            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Leave Info"); table.addHeaderCell("Allowance");
             Collections.sort(records, (a, b) -> b.getDate().compareTo(a.getDate()));
             for (DutyRecord record : records) {
                 try { SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); Date date = inputFormat.parse(record.getDate()); table.addCell(outputFormat.format(date)); } catch (Exception e) { table.addCell(record.getDate()); }
                 table.addCell(record.getDutyFrom() + "-" + record.getDutyTo());
                 table.addCell(String.format("%.1f", record.getTotalNightHours()));
                 table.addCell("₹" + decimalFormat.format(record.getEffectiveBasicPay()));
-                table.addCell(record.isNationalHoliday() ? "Holiday" : "Regular");
+                
+                // Determine type
+                String type = "Regular";
+                if (record.isNationalHoliday()) type = "Holiday";
+                else if (record.isWeeklyRest()) type = "Weekly Rest";
+                table.addCell(type);
+                
+                // Leave information
+                String leaveInfo = "";
+                if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) {
+                    leaveInfo = record.getLeaveFrom() + " to " + record.getLeaveTo();
+                    if (record.getLeaveType() != null && !record.getLeaveType().isEmpty()) {
+                        leaveInfo += " (" + record.getLeaveType() + ")";
+                    }
+                }
+                table.addCell(leaveInfo);
+                
                 table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
             }
             document.add(table); document.close();

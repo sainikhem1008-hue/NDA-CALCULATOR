@@ -112,7 +112,104 @@
               <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="55.0" android:textColor="@color/black" android:textColorHint="@color/black" />
           </com.google.android.material.textfield.TextInputLayout>
 
-                  <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/black" android:textStyle="bold" android:layout_marginBottom="16dp" />
+                  <CheckBox 
+                      android:id="@+id/cbNationalHoliday" 
+                      style="@style/GreenCheckBoxStyle"
+                      android:layout_width="match_parent" 
+                      android:layout_height="wrap_content" 
+                      android:text="🎉 National Holiday" 
+                      android:layout_marginBottom="8dp" />
+
+                  <CheckBox 
+                      android:id="@+id/cbWeeklyRest" 
+                      style="@style/GreenCheckBoxStyle"
+                      android:layout_width="match_parent" 
+                      android:layout_height="wrap_content" 
+                      android:text="🌅 Weekly Rest" 
+                      android:layout_marginBottom="16dp" />
+
+        <!-- Leave Management Section -->
+        <androidx.cardview.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="8dp"
+            app:cardElevation="2dp"
+            app:cardBackgroundColor="@color/light_option_green"
+            android:layout_marginBottom="16dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="📅 Leave Management"
+                    android:textColor="@color/option_green"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:layout_marginBottom="12dp" />
+
+                <LinearLayout 
+                    android:layout_width="match_parent" 
+                    android:layout_height="wrap_content" 
+                    android:orientation="horizontal">
+
+                    <com.google.android.material.textfield.TextInputLayout 
+                        style="@style/GreenOptionTextInputLayout"
+                        android:layout_width="0dp" 
+                        android:layout_weight="1" 
+                        android:layout_height="wrap_content" 
+                        android:hint="@string/leave_from"
+                        android:layout_marginEnd="8dp">
+                        <com.google.android.material.textfield.TextInputEditText 
+                            android:id="@+id/etLeaveFrom" 
+                            android:layout_width="match_parent" 
+                            android:layout_height="wrap_content" 
+                            android:focusable="false" 
+                            android:inputType="none" 
+                            android:textColor="@color/black" 
+                            android:textColorHint="@color/option_green" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout 
+                        style="@style/GreenOptionTextInputLayout"
+                        android:layout_width="0dp" 
+                        android:layout_weight="1" 
+                        android:layout_height="wrap_content" 
+                        android:hint="@string/leave_to"
+                        android:layout_marginStart="8dp">
+                        <com.google.android.material.textfield.TextInputEditText 
+                            android:id="@+id/etLeaveTo" 
+                            android:layout_width="match_parent" 
+                            android:layout_height="wrap_content" 
+                            android:focusable="false" 
+                            android:inputType="none" 
+                            android:textColor="@color/black" 
+                            android:textColorHint="@color/option_green" />
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout 
+                    style="@style/GreenOptionTextInputLayout"
+                    android:layout_width="match_parent" 
+                    android:layout_height="wrap_content" 
+                    android:hint="@string/type_of_leave"
+                    android:layout_marginTop="12dp">
+                    <com.google.android.material.textfield.TextInputEditText 
+                        android:id="@+id/etLeaveType" 
+                        android:layout_width="match_parent" 
+                        android:layout_height="wrap_content" 
+                        android:focusable="false" 
+                        android:inputType="none" 
+                        android:textColor="@color/black" 
+                        android:textColorHint="@color/option_green" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
+        </androidx.cardview.widget.CardView>
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnCalculate"

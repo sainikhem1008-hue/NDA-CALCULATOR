@@ -39,4 +39,20 @@
         <item name="android:textSize">14sp</item>
         <item name="android:textStyle">bold</item>
     </style>
+
+    <!-- Custom style for green option boxes -->
+    <style name="GreenOptionTextInputLayout" parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <item name="boxBackgroundColor">@color/light_option_green</item>
+        <item name="boxStrokeColor">@color/option_green</item>
+        <item name="hintTextColor">@color/option_green</item>
+        <item name="android:textColorHint">@color/option_green</item>
+    </style>
+
+    <!-- Custom style for green checkboxes -->
+    <style name="GreenCheckBoxStyle" parent="Widget.MaterialComponents.CompoundButton.CheckBox">
+        <item name="buttonTint">@color/option_green</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
 </resources>

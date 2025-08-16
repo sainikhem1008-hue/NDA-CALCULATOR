@@ -19,6 +19,10 @@ public class DutyRecord {
     private double dearnessAllowance;
     private double nightDutyAllowance;
     private boolean isNationalHoliday;
+    private boolean isWeeklyRest;
+    private String leaveFrom;
+    private String leaveTo;
+    private String leaveType;
 
     public DutyRecord() { this.id = System.currentTimeMillis(); }
 
@@ -46,6 +50,14 @@ public class DutyRecord {
     public void setNightDutyAllowance(double nightDutyAllowance) { this.nightDutyAllowance = nightDutyAllowance; }
     public boolean isNationalHoliday() { return isNationalHoliday; }
     public void setNationalHoliday(boolean nationalHoliday) { isNationalHoliday = nationalHoliday; }
+    public boolean isWeeklyRest() { return isWeeklyRest; }
+    public void setWeeklyRest(boolean weeklyRest) { isWeeklyRest = weeklyRest; }
+    public String getLeaveFrom() { return leaveFrom; }
+    public void setLeaveFrom(String leaveFrom) { this.leaveFrom = leaveFrom; }
+    public String getLeaveTo() { return leaveTo; }
+    public void setLeaveTo(String leaveTo) { this.leaveTo = leaveTo; }
+    public String getLeaveType() { return leaveType; }
+    public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 }
