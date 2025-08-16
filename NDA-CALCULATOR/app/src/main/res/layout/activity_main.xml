@@ -28,7 +28,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="🌙 Night Duty Calculator"
+                    android:text="🌙 Night Duty Allowance Calculator"
                     android:textColor="@color/white"
                     android:textSize="24sp"
                     android:textStyle="bold" />
