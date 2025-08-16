@@ -43,7 +43,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
         if (record.isNationalHoliday()) {
 		holder.tvType.setText("🎉 Holiday");
-		holder.tvType.setTextColor(Color.parseColor("#27AE60")); // green
+		holder.tvType.setTextColor(Color.parseColor("#f39c12")); // orange
 	    } else {
 		holder.tvType.setText("📅 Regular");
 		holder.tvType.setTextColor(Color.BLACK);
