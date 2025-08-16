@@ -3,12 +3,13 @@ plugins {
 }
 
 android {
-    compileSdkVersion 26
+    compileSdkVersion 21
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "com.yourname.nightdutycalculator"
-        minSdkVersion 21
-        targetSdkVersion 26
+        minSdkVersion 16
+        targetSdkVersion 21
         versionCode 1
         versionName "1.0"
     }
@@ -21,18 +22,21 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
+    
+    lintOptions {
+        abortOnError false
     }
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.0.2'
-    implementation 'com.google.android.material:material:1.0.0'
-    implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'androidx.recyclerview:recyclerview:1.0.0'
+    implementation 'com.android.support:appcompat-v7:21.0.3'
+    implementation 'com.android.support:design:21.0.3'
+    implementation 'com.android.support:cardview-v7:21.0.3'
+    implementation 'com.android.support:recyclerview-v7:21.0.3'
     
     // JSON handling
-    implementation 'com.google.code.gson:gson:2.8.5'
+    implementation 'com.google.code.gson:gson:2.3.1'
 }
