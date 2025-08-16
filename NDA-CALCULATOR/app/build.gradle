@@ -30,6 +30,14 @@ android {
     kotlinOptions {
         jvmTarget = "17"
     }
+    
+    // Ensure kapt uses the same JVM target
+    kapt {
+        javacOptions {
+            option("-source", "17")
+            option("-target", "17")
+        }
+    }
 }
 
 dependencies {
