@@ -71,7 +71,14 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             holder.tvType.setTextColor(Color.BLACK);
         }
         
-        holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+        // Display allowance with status
+        if (record.getAllowanceStatus() != null && record.getAllowanceStatus().startsWith("❌")) {
+            holder.tvAllowance.setText(record.getAllowanceStatus());
+            holder.tvAllowance.setTextColor(Color.parseColor("#e74c3c")); // red for no allowance
+        } else {
+            holder.tvAllowance.setText("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+            holder.tvAllowance.setTextColor(Color.parseColor("#f39c12")); // orange for normal allowance
+        }
         holder.btnDelete.setOnClickListener(v -> { if (deleteListener != null) deleteListener.onRecordDelete(record, position); });
     }
 

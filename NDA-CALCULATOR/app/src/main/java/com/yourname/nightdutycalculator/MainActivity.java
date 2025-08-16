@@ -197,6 +197,28 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 return;
             }
 
+            // Show warning if calculating for weekly rest or leave
+            if (isWeeklyRest) {
+                Toast.makeText(this, "⚠️ Weekly Rest Day - No allowance will be calculated", Toast.LENGTH_LONG).show();
+            } else if (!leaveFrom.isEmpty() && !leaveTo.isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Calendar dutyDateCal = Calendar.getInstance();
+                    Calendar leaveFromCal = Calendar.getInstance();
+                    Calendar leaveToCal = Calendar.getInstance();
+                    
+                    dutyDateCal.setTime(sdf.parse(dutyDate));
+                    leaveFromCal.setTime(sdf.parse(leaveFrom));
+                    leaveToCal.setTime(sdf.parse(leaveTo));
+                    
+                    if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
+                        Toast.makeText(this, "⚠️ Leave Period - No allowance will be calculated", Toast.LENGTH_LONG).show();
+                    }
+                } catch (Exception e) {
+                    // Ignore date parsing errors
+                }
+            }
+
             double effectiveBasicPay = Math.min(basicPay, ceilingLimit);
 
             Calendar fromCal = Calendar.getInstance();
@@ -224,7 +246,38 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double totalNightHours = nightHours1 + nightHours2;
             double nightHoursDivided = totalNightHours / 6.0;
 
-            double nightDutyAllowance = nightHoursDivided * (effectiveBasicPay * (1 + dearnessAllowance/100)) / 200;
+            // Check if duty date falls within leave period
+            boolean isOnLeave = false;
+            if (!leaveFrom.isEmpty() && !leaveTo.isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Calendar dutyDateCal = Calendar.getInstance();
+                    Calendar leaveFromCal = Calendar.getInstance();
+                    Calendar leaveToCal = Calendar.getInstance();
+                    
+                    dutyDateCal.setTime(sdf.parse(dutyDate));
+                    leaveFromCal.setTime(sdf.parse(leaveFrom));
+                    leaveToCal.setTime(sdf.parse(leaveTo));
+                    
+                    // Check if duty date is within leave period
+                    isOnLeave = !dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal);
+                } catch (Exception e) {
+                    // If date parsing fails, assume not on leave
+                    isOnLeave = false;
+                }
+            }
+
+            // Calculate night duty allowance based on conditions
+            double nightDutyAllowance = 0.0;
+            String allowanceStatus = "Calculated";
+            
+            if (isWeeklyRest) {
+                allowanceStatus = "❌ No Allowance (Weekly Rest)";
+            } else if (isOnLeave) {
+                allowanceStatus = "❌ No Allowance (On Leave)";
+            } else {
+                nightDutyAllowance = nightHoursDivided * (effectiveBasicPay * (1 + dearnessAllowance/100)) / 200;
+            }
 
             currentCalculation = new DutyRecord();
             currentCalculation.setDate(dutyDate);
@@ -243,6 +296,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             currentCalculation.setLeaveFrom(leaveFrom);
             currentCalculation.setLeaveTo(leaveTo);
             currentCalculation.setLeaveType(leaveType);
+            currentCalculation.setAllowanceStatus(allowanceStatus);
 
             displayResults();
         } catch (NumberFormatException e) {
@@ -284,7 +338,13 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         addResultItem("Night Hours (22:00-00:00):", String.format("%.2f hrs", currentCalculation.getNightHours1()));
         addResultItem("Night Hours (00:00-06:00):", String.format("%.2f hrs", currentCalculation.getNightHours2()));
         addResultItem("Total Night Hours:", String.format("%.2f hrs", currentCalculation.getTotalNightHours()));
-        addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
+        
+        // Display allowance with status
+        if (currentCalculation.getAllowanceStatus() != null && currentCalculation.getAllowanceStatus().startsWith("❌")) {
+            addResultItem("Night Allowance:", currentCalculation.getAllowanceStatus());
+        } else {
+            addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
+        }
         
         // Display weekly rest and leave information if available
         if (currentCalculation.isWeeklyRest()) {
@@ -380,7 +440,12 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 }
                 table.addCell(leaveInfo);
                 
-                table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+                // Display allowance in PDF
+                if (record.getAllowanceStatus() != null && record.getAllowanceStatus().startsWith("❌")) {
+                    table.addCell(record.getAllowanceStatus().replace("❌ ", ""));
+                } else {
+                    table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+                }
             }
             document.add(table); document.close();
             Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
