@@ -24,8 +24,6 @@ jobs:
       uses: android-actions/setup-android@v3
       with:
         api-level: 34
-        target: google_apis
-        arch: x86_64
 
     - name: Grant execute permission for gradlew
       run: chmod +x ./NDA-CALCULATOR/gradlew
@@ -40,13 +38,9 @@ jobs:
         path: |
           ~/.gradle/caches
           ~/.gradle/wrapper
-        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        key: ${{ runner.os }}-gradle-${{ hashFiles('NDA-CALCULATOR/**/*.gradle*', 'NDA-CALCULATOR/**/gradle-wrapper.properties') }}
         restore-keys: |
           ${{ runner.os }}-gradle-
-
-    - name: Validate Gradle wrapper
-      working-directory: NDA-CALCULATOR
-      run: gradle wrapper --gradle-version 8.2
 
     - name: Show tool versions
       working-directory: NDA-CALCULATOR
@@ -57,14 +51,17 @@ jobs:
     - name: Build with Gradle
       working-directory: NDA-CALCULATOR
       run: |
-        ./gradlew clean
-        ./gradlew assembleDebug --stacktrace --info
+        ./gradlew clean --console=plain
+        ./gradlew assembleDebug --console=plain --no-daemon
 
     - name: List build outputs
       working-directory: NDA-CALCULATOR
+      if: always()
       run: |
         echo "Build outputs:"
         find app/build/outputs -name "*.apk" -o -name "*.aab" 2>/dev/null || echo "No APK/AAB files found"
+        echo "Build directory contents:"
+        ls -la app/build/ 2>/dev/null || echo "Build directory not found"
 
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
