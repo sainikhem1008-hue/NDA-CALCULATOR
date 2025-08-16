@@ -20,9 +20,6 @@ public class DutyRecord {
     private double nightDutyAllowance;
     private boolean isNationalHoliday;
     private boolean isWeeklyRest;
-    private String leaveFrom;
-    private String leaveTo;
-    private String leaveType;
     private String allowanceStatus;
     private String leaveStatus;
 
@@ -54,12 +51,6 @@ public class DutyRecord {
     public void setNationalHoliday(boolean nationalHoliday) { isNationalHoliday = nationalHoliday; }
     public boolean isWeeklyRest() { return isWeeklyRest; }
     public void setWeeklyRest(boolean weeklyRest) { isWeeklyRest = weeklyRest; }
-    public String getLeaveFrom() { return leaveFrom; }
-    public void setLeaveFrom(String leaveFrom) { this.leaveFrom = leaveFrom; }
-    public String getLeaveTo() { return leaveTo; }
-    public void setLeaveTo(String leaveTo) { this.leaveTo = leaveTo; }
-    public String getLeaveType() { return leaveType; }
-    public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
     public String getAllowanceStatus() { return allowanceStatus; }
     public void setAllowanceStatus(String allowanceStatus) { this.allowanceStatus = allowanceStatus; }
     public String getLeaveStatus() { return leaveStatus; }

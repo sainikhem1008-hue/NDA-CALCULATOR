@@ -46,8 +46,8 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements RecordsAdapter.OnRecordDeleteListener {
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
-    private TextInputEditText etLeaveFrom, etLeaveTo, etLeaveType;
     private CheckBox cbNationalHoliday, cbWeeklyRest;
+    private MaterialButton btnLeaveManagement, btnAllowanceCalculator;
     private MaterialButton btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
@@ -75,9 +75,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etDearnessAllowance = findViewById(R.id.etDearnessAllowance);
         cbNationalHoliday = findViewById(R.id.cbNationalHoliday);
         cbWeeklyRest = findViewById(R.id.cbWeeklyRest);
-        etLeaveFrom = findViewById(R.id.etLeaveFrom);
-        etLeaveTo = findViewById(R.id.etLeaveTo);
-        etLeaveType = findViewById(R.id.etLeaveType);
+        btnLeaveManagement = findViewById(R.id.btnLeaveManagement);
+        btnAllowanceCalculator = findViewById(R.id.btnAllowanceCalculator);
         btnCalculate = findViewById(R.id.btnCalculate);
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
@@ -99,9 +98,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etDutyDate.setOnClickListener(v -> showDatePicker());
         etDutyFrom.setOnClickListener(v -> showTimePicker(etDutyFrom));
         etDutyTo.setOnClickListener(v -> showTimePicker(etDutyTo));
-        etLeaveFrom.setOnClickListener(v -> showDatePicker(etLeaveFrom));
-        etLeaveTo.setOnClickListener(v -> showDatePicker(etLeaveTo));
-        etLeaveType.setOnClickListener(v -> showLeaveTypeDialog());
+        btnLeaveManagement.setOnClickListener(v -> { vibrate(); openLeaveManagement(); });
+        btnAllowanceCalculator.setOnClickListener(v -> { vibrate(); openAllowanceCalculator(); });
         btnCalculate.setOnClickListener(v -> { vibrate(); calculateNightDuty(); });
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
         btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
@@ -151,22 +149,14 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         datePickerDialog.show();
     }
 
-    private void showLeaveTypeDialog() {
-        String[] leaveTypes = {
-            getString(R.string.casual_leave),
-            getString(R.string.sick_leave),
-            getString(R.string.earned_leave),
-            getString(R.string.compensatory_off),
-            getString(R.string.other_leave)
-        };
+    private void openLeaveManagement() {
+        Intent intent = new Intent(this, LeaveManagementActivity.class);
+        startActivity(intent);
+    }
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Type of Leave")
-               .setItems(leaveTypes, (dialog, which) -> {
-                   etLeaveType.setText(leaveTypes[which]);
-               })
-               .setNegativeButton("Cancel", null)
-               .show();
+    private void openAllowanceCalculator() {
+        // Already in allowance calculator, just show a message
+        Toast.makeText(this, "You are already in Allowance Calculator", Toast.LENGTH_SHORT).show();
     }
 
     private void showTimePicker(TextInputEditText editText) {
@@ -188,9 +178,6 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double dearnessAllowance = Double.parseDouble(etDearnessAllowance.getText().toString());
             boolean isNationalHoliday = cbNationalHoliday.isChecked();
             boolean isWeeklyRest = cbWeeklyRest.isChecked();
-            String leaveFrom = etLeaveFrom.getText().toString();
-            String leaveTo = etLeaveTo.getText().toString();
-            String leaveType = etLeaveType.getText().toString();
 
             if (dutyDate.isEmpty() || dutyFrom.isEmpty() || dutyTo.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
@@ -229,21 +216,23 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double totalNightHours = nightHours1 + nightHours2;
             double nightHoursDivided = totalNightHours / 6.0;
 
-            // Check if duty date falls within ACTIVE leave period (not future leave)
+            // Check if duty date falls within any active leave period from leave database
             boolean isOnLeave = false;
             String leaveStatus = "";
             
-            if (!leaveFrom.isEmpty() && !leaveTo.isEmpty()) {
+            // Load leave records from separate database
+            SharedPreferences leavePrefs = getSharedPreferences("LeaveRecords", Context.MODE_PRIVATE);
+            String leaveRecordsJson = leavePrefs.getString("leave_records", "[]");
+            Type leaveListType = new TypeToken<List<LeaveRecord>>(){}.getType();
+            List<LeaveRecord> leaveRecords = gson.fromJson(leaveRecordsJson, leaveListType);
+            
+            if (leaveRecords != null && !leaveRecords.isEmpty()) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     Calendar dutyDateCal = Calendar.getInstance();
-                    Calendar leaveFromCal = Calendar.getInstance();
-                    Calendar leaveToCal = Calendar.getInstance();
                     Calendar todayCal = Calendar.getInstance();
                     
                     dutyDateCal.setTime(sdf.parse(dutyDate));
-                    leaveFromCal.setTime(sdf.parse(leaveFrom));
-                    leaveToCal.setTime(sdf.parse(leaveTo));
                     
                     // Set today's date to start of day for comparison
                     todayCal.set(Calendar.HOUR_OF_DAY, 0);
@@ -251,27 +240,32 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                     todayCal.set(Calendar.SECOND, 0);
                     todayCal.set(Calendar.MILLISECOND, 0);
                     
-                    // Check if leave period is in the future
-                    if (leaveFromCal.after(todayCal)) {
-                        leaveStatus = "📅 Leave Applied (Future: " + leaveFrom + " to " + leaveTo + ")";
-                        isOnLeave = false; // Future leave doesn't affect current allowance
-                    } else if (leaveToCal.before(todayCal)) {
-                        leaveStatus = "📅 Leave Completed (" + leaveFrom + " to " + leaveTo + ")";
-                        isOnLeave = false; // Past leave doesn't affect current allowance
-                    } else {
-                        // Current active leave period
-                        if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
-                            isOnLeave = true;
-                            leaveStatus = "📅 Currently On Leave (" + leaveFrom + " to " + leaveTo + ")";
-                        } else {
-                            leaveStatus = "📅 Leave Period Active (" + leaveFrom + " to " + leaveTo + ")";
-                            isOnLeave = false; // Duty date is not within leave period
+                    // Check each leave record
+                    for (LeaveRecord leaveRecord : leaveRecords) {
+                        if (leaveRecord.getStatus().equals("Applied") || leaveRecord.getStatus().equals("Approved")) {
+                            Calendar leaveFromCal = Calendar.getInstance();
+                            Calendar leaveToCal = Calendar.getInstance();
+                            
+                            leaveFromCal.setTime(sdf.parse(leaveRecord.getLeaveFrom()));
+                            leaveToCal.setTime(sdf.parse(leaveRecord.getLeaveTo()));
+                            
+                            // Check if duty date is within this leave period
+                            if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
+                                isOnLeave = true;
+                                leaveStatus = "📅 On Leave (" + leaveRecord.getLeaveType() + ": " + 
+                                            leaveRecord.getLeaveFrom() + " to " + leaveRecord.getLeaveTo() + ")";
+                                break; // Found matching leave period
+                            }
                         }
+                    }
+                    
+                    if (!isOnLeave && !leaveRecords.isEmpty()) {
+                        leaveStatus = "📅 Leave Records Available";
                     }
                 } catch (Exception e) {
                     // If date parsing fails, assume not on leave
                     isOnLeave = false;
-                    leaveStatus = "📅 Leave Dates Invalid";
+                    leaveStatus = "📅 Leave Check Error";
                 }
             }
 
@@ -301,9 +295,6 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             currentCalculation.setNightDutyAllowance(nightDutyAllowance);
             currentCalculation.setNationalHoliday(isNationalHoliday);
             currentCalculation.setWeeklyRest(isWeeklyRest);
-            currentCalculation.setLeaveFrom(leaveFrom);
-            currentCalculation.setLeaveTo(leaveTo);
-            currentCalculation.setLeaveType(leaveType);
             currentCalculation.setAllowanceStatus(allowanceStatus);
             currentCalculation.setLeaveStatus(leaveStatus);
 
