@@ -47,4 +47,10 @@ dependencies {
     // Lifecycle & ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0"
     implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.7.0"
+    
+    // JSON handling
+    implementation 'com.google.code.gson:gson:2.10.1'
+    
+    // PDF generation
+    implementation 'com.itextpdf:itext7-core:7.2.5'
 }
