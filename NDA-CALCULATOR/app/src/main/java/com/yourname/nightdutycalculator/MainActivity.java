@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
     private CheckBox cbNationalHoliday, cbWeeklyRest;
-    private MaterialButton btnLeaveManagement, btnAllowanceCalculator;
+    private MaterialButton btnLeaveManagement;
     private MaterialButton btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         cbNationalHoliday = findViewById(R.id.cbNationalHoliday);
         cbWeeklyRest = findViewById(R.id.cbWeeklyRest);
         btnLeaveManagement = findViewById(R.id.btnLeaveManagement);
-        btnAllowanceCalculator = findViewById(R.id.btnAllowanceCalculator);
+
         btnCalculate = findViewById(R.id.btnCalculate);
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etDutyFrom.setOnClickListener(v -> showTimePicker(etDutyFrom));
         etDutyTo.setOnClickListener(v -> showTimePicker(etDutyTo));
         btnLeaveManagement.setOnClickListener(v -> { vibrate(); openLeaveManagement(); });
-        btnAllowanceCalculator.setOnClickListener(v -> { vibrate(); openAllowanceCalculator(); });
+
         btnCalculate.setOnClickListener(v -> { vibrate(); calculateNightDuty(); });
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
         btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
@@ -155,10 +155,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         startActivity(intent);
     }
 
-    private void openAllowanceCalculator() {
-        // Already in allowance calculator, just show a message
-        Toast.makeText(this, "You are already in Allowance Calculator", Toast.LENGTH_SHORT).show();
-    }
+
 
     private void showTimePicker(TextInputEditText editText) {
         Calendar calendar = Calendar.getInstance();
@@ -411,7 +408,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 
                 // Determine type
                 String type = "Regular";
-                if (record.isNationalHoliday()) type = "Holiday";
+                if (record.isNationalHoliday() && record.isWeeklyRest()) type = "Rest + Holiday";
+                else if (record.isNationalHoliday()) type = "Holiday";
                 else if (record.isWeeklyRest()) type = "Weekly Rest";
                 table.addCell(type);
                 

@@ -44,7 +44,9 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         
         // Determine type text based on various conditions
         String typeText;
-        if (record.isNationalHoliday()) {
+        if (record.isNationalHoliday() && record.isWeeklyRest()) {
+            typeText = "🌅 Rest + Holiday";
+        } else if (record.isNationalHoliday()) {
             typeText = "🎉 Holiday";
         } else if (record.isWeeklyRest()) {
             typeText = "🌅 Weekly Rest";
@@ -55,7 +57,9 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         holder.tvType.setText(typeText);
         
         // Set color based on type
-        if (record.isNationalHoliday()) {
+        if (record.isNationalHoliday() && record.isWeeklyRest()) {
+            holder.tvType.setTextColor(Color.parseColor("#9C27B0")); // purple for both
+        } else if (record.isNationalHoliday()) {
             holder.tvType.setTextColor(Color.parseColor("#f39c12")); // orange
         } else if (record.isWeeklyRest()) {
             holder.tvType.setTextColor(Color.parseColor("#4CAF50")); // green

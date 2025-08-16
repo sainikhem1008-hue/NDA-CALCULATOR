@@ -137,24 +137,10 @@
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnLeaveManagement"
-                android:layout_width="0dp"
-                android:layout_weight="1"
+                android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:layout_marginEnd="8dp"
                 android:backgroundTint="@color/option_green"
                 android:text="📅 Leave Management"
-                android:textColor="@color/white"
-                android:textSize="14sp"
-                android:textStyle="bold" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnAllowanceCalculator"
-                android:layout_width="0dp"
-                android:layout_weight="1"
-                android:layout_height="56dp"
-                android:layout_marginStart="8dp"
-                android:backgroundTint="@color/header_blue"
-                android:text="💰 Allowance Calculator"
                 android:textColor="@color/white"
                 android:textSize="14sp"
                 android:textStyle="bold" />
