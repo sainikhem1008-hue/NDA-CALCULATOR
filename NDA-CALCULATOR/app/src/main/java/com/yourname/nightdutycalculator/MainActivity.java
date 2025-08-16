@@ -197,26 +197,9 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 return;
             }
 
-            // Show warning if calculating for weekly rest or leave
+            // Show warning if calculating for weekly rest
             if (isWeeklyRest) {
                 Toast.makeText(this, "⚠️ Weekly Rest Day - No allowance will be calculated", Toast.LENGTH_LONG).show();
-            } else if (!leaveFrom.isEmpty() && !leaveTo.isEmpty()) {
-                try {
-                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-                    Calendar dutyDateCal = Calendar.getInstance();
-                    Calendar leaveFromCal = Calendar.getInstance();
-                    Calendar leaveToCal = Calendar.getInstance();
-                    
-                    dutyDateCal.setTime(sdf.parse(dutyDate));
-                    leaveFromCal.setTime(sdf.parse(leaveFrom));
-                    leaveToCal.setTime(sdf.parse(leaveTo));
-                    
-                    if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
-                        Toast.makeText(this, "⚠️ Leave Period - No allowance will be calculated", Toast.LENGTH_LONG).show();
-                    }
-                } catch (Exception e) {
-                    // Ignore date parsing errors
-                }
             }
 
             double effectiveBasicPay = Math.min(basicPay, ceilingLimit);
@@ -246,24 +229,49 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double totalNightHours = nightHours1 + nightHours2;
             double nightHoursDivided = totalNightHours / 6.0;
 
-            // Check if duty date falls within leave period
+            // Check if duty date falls within ACTIVE leave period (not future leave)
             boolean isOnLeave = false;
+            String leaveStatus = "";
+            
             if (!leaveFrom.isEmpty() && !leaveTo.isEmpty()) {
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     Calendar dutyDateCal = Calendar.getInstance();
                     Calendar leaveFromCal = Calendar.getInstance();
                     Calendar leaveToCal = Calendar.getInstance();
+                    Calendar todayCal = Calendar.getInstance();
                     
                     dutyDateCal.setTime(sdf.parse(dutyDate));
                     leaveFromCal.setTime(sdf.parse(leaveFrom));
                     leaveToCal.setTime(sdf.parse(leaveTo));
                     
-                    // Check if duty date is within leave period
-                    isOnLeave = !dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal);
+                    // Set today's date to start of day for comparison
+                    todayCal.set(Calendar.HOUR_OF_DAY, 0);
+                    todayCal.set(Calendar.MINUTE, 0);
+                    todayCal.set(Calendar.SECOND, 0);
+                    todayCal.set(Calendar.MILLISECOND, 0);
+                    
+                    // Check if leave period is in the future
+                    if (leaveFromCal.after(todayCal)) {
+                        leaveStatus = "📅 Leave Applied (Future: " + leaveFrom + " to " + leaveTo + ")";
+                        isOnLeave = false; // Future leave doesn't affect current allowance
+                    } else if (leaveToCal.before(todayCal)) {
+                        leaveStatus = "📅 Leave Completed (" + leaveFrom + " to " + leaveTo + ")";
+                        isOnLeave = false; // Past leave doesn't affect current allowance
+                    } else {
+                        // Current active leave period
+                        if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
+                            isOnLeave = true;
+                            leaveStatus = "📅 Currently On Leave (" + leaveFrom + " to " + leaveTo + ")";
+                        } else {
+                            leaveStatus = "📅 Leave Period Active (" + leaveFrom + " to " + leaveTo + ")";
+                            isOnLeave = false; // Duty date is not within leave period
+                        }
+                    }
                 } catch (Exception e) {
                     // If date parsing fails, assume not on leave
                     isOnLeave = false;
+                    leaveStatus = "📅 Leave Dates Invalid";
                 }
             }
 
@@ -297,6 +305,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             currentCalculation.setLeaveTo(leaveTo);
             currentCalculation.setLeaveType(leaveType);
             currentCalculation.setAllowanceStatus(allowanceStatus);
+            currentCalculation.setLeaveStatus(leaveStatus);
 
             displayResults();
         } catch (NumberFormatException e) {
@@ -351,11 +360,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             addResultItem("Weekly Rest:", "✅ Applied");
         }
         
-        if (currentCalculation.getLeaveFrom() != null && !currentCalculation.getLeaveFrom().isEmpty()) {
-            addResultItem("Leave Period:", currentCalculation.getLeaveFrom() + " to " + currentCalculation.getLeaveTo());
-            if (currentCalculation.getLeaveType() != null && !currentCalculation.getLeaveType().isEmpty()) {
-                addResultItem("Leave Type:", currentCalculation.getLeaveType());
-            }
+        if (currentCalculation.getLeaveStatus() != null && !currentCalculation.getLeaveStatus().isEmpty()) {
+            addResultItem("Leave Status:", currentCalculation.getLeaveStatus());
         }
     }
 
@@ -432,11 +438,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 
                 // Leave information
                 String leaveInfo = "";
-                if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) {
-                    leaveInfo = record.getLeaveFrom() + " to " + record.getLeaveTo();
-                    if (record.getLeaveType() != null && !record.getLeaveType().isEmpty()) {
-                        leaveInfo += " (" + record.getLeaveType() + ")";
-                    }
+                if (record.getLeaveStatus() != null && !record.getLeaveStatus().isEmpty()) {
+                    leaveInfo = record.getLeaveStatus().replace("📅 ", "");
                 }
                 table.addCell(leaveInfo);
                 

@@ -24,6 +24,7 @@ public class DutyRecord {
     private String leaveTo;
     private String leaveType;
     private String allowanceStatus;
+    private String leaveStatus;
 
     public DutyRecord() { this.id = System.currentTimeMillis(); }
 
@@ -61,6 +62,8 @@ public class DutyRecord {
     public void setLeaveType(String leaveType) { this.leaveType = leaveType; }
     public String getAllowanceStatus() { return allowanceStatus; }
     public void setAllowanceStatus(String allowanceStatus) { this.allowanceStatus = allowanceStatus; }
+    public String getLeaveStatus() { return leaveStatus; }
+    public void setLeaveStatus(String leaveStatus) { this.leaveStatus = leaveStatus; }
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
 }

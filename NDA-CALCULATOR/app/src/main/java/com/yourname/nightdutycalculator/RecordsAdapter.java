@@ -52,10 +52,18 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
             typeText.append("📅 Regular");
         }
         
-        // Add leave information if available
-        if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) {
+        // Add leave status if available
+        if (record.getLeaveStatus() != null && !record.getLeaveStatus().isEmpty()) {
             if (typeText.length() > 0) typeText.append(" | ");
-            typeText.append("📅 Leave");
+            if (record.getLeaveStatus().contains("Currently On Leave")) {
+                typeText.append("📅 On Leave");
+            } else if (record.getLeaveStatus().contains("Leave Applied")) {
+                typeText.append("📅 Leave Applied");
+            } else if (record.getLeaveStatus().contains("Leave Completed")) {
+                typeText.append("📅 Leave Completed");
+            } else {
+                typeText.append("📅 Leave Active");
+            }
         }
         
         holder.tvType.setText(typeText.toString());
