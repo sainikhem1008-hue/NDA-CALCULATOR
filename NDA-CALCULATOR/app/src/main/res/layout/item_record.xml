@@ -79,12 +79,12 @@
 
         </LinearLayout>
 
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/btnDelete"
             android:layout_width="wrap_content"
             android:layout_height="32dp"
             android:layout_marginStart="8dp"
-            android:background="@color/accent_red"
+            android:backgroundTint="@color/accent_red"
             android:text="🗑"
             android:textColor="@color/white"
             android:textSize="12sp"

@@ -114,7 +114,15 @@
 
                   <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/black" android:textStyle="bold" android:layout_marginBottom="16dp" />
 
-        <Button android:id="@+id/btnCalculate" android:layout_width="match_parent" android:layout_height="56dp" android:background="@color/accent_green" android:text="🧮 Calculate Allowance" android:textColor="@color/white" android:textSize="16sp" android:textStyle="bold" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCalculate"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:backgroundTint="@color/accent_green"
+            android:text="🧮 Calculate Allowance"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:id="@+id/llResults" />
 
@@ -125,25 +133,23 @@
             android:orientation="horizontal"
             android:layout_marginTop="16dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSave"
+                style="@style/BlueButtonStyle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@color/header_blue"
-                android:text="💾 Save"
-                android:textColor="@color/white" />
+                android:text="💾 Save" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExport"
+                style="@style/BlueButtonStyle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:background="@color/header_blue"
-                android:text="📄 Export PDF"
-                android:textColor="@color/white" />
+                android:text="📄 Export PDF" />
 
         </LinearLayout>
 
@@ -153,25 +159,23 @@
             android:orientation="horizontal"
             android:layout_marginTop="8dp">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnClear"
+                style="@style/BlueButtonStyle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@color/header_blue"
-                android:text="🗑️ Clear All"
-                android:textColor="@color/white" />
+                android:text="🗑️ Clear All" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnExit"
+                style="@style/BlueButtonStyle"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:background="@color/header_blue"
-                android:text="🚪 Exit"
-                android:textColor="@color/white" />
+                android:text="🚪 Exit" />
 
         </LinearLayout>
 

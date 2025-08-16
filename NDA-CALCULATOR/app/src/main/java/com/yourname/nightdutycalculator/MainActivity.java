@@ -12,7 +12,6 @@ import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -47,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
     private CheckBox cbNationalHoliday;
-    private Button btnCalculate, btnSave, btnExport, btnClear, btnExit;
+    private MaterialButton btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
     private RecyclerView rvRecords;
