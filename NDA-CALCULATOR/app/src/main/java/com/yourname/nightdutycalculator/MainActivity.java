@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
 
         btnCalculate.setOnClickListener(v -> { vibrate(); calculateNightDuty(); });
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
-        btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
+        btnExport.setOnClickListener(v -> { vibrate(); testPDFExport(); });
         btnClear.setOnClickListener(v -> { vibrate(); clearAllRecords(); });
         btnExit.setOnClickListener(v -> { vibrate(); exitApp(); });
 
@@ -361,35 +361,76 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         Toast.makeText(this, "Record saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
-    private void exportToPDF() {
-        if (records.isEmpty()) { Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show(); return; }
+    private void testPDFExport() {
         try {
-            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String baseFileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
-            String fileName = baseFileName + ".pdf";
-            File pdfFile = new File(downloadsDir, fileName);
-            
-            // Handle existing files by adding a counter
-            int counter = 1;
-            while (pdfFile.exists()) {
-                fileName = baseFileName + "_(" + counter + ").pdf";
-                pdfFile = new File(downloadsDir, fileName);
-                counter++;
-            }
+            // Create a simple test PDF
+            File pdfFile = new File(getExternalFilesDir(null), "Test_Allowance_Report.pdf");
             
             PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
+            
+            document.add(new Paragraph("🌙 Test Night Duty Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
+            document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
+            document.add(new Paragraph("Total Records: " + records.size()));
+            
+            if (!records.isEmpty()) {
+                document.add(new Paragraph("Sample Record:"));
+                DutyRecord sample = records.get(0);
+                document.add(new Paragraph("Date: " + sample.getDate()));
+                document.add(new Paragraph("Time: " + sample.getDutyFrom() + " - " + sample.getDutyTo()));
+                document.add(new Paragraph("Hours: " + sample.getTotalNightHours()));
+                document.add(new Paragraph("Allowance: ₹" + decimalFormat.format(sample.getNightDutyAllowance())));
+            }
+            
+            document.close();
+            
+            Toast.makeText(this, "Test PDF created: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "Test PDF Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private void exportToPDF() {
+        if (records.isEmpty()) {
+            Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Create file in app's external files directory (no special permissions needed)
+            File pdfFile = new File(getExternalFilesDir(null), "Night_Duty_Report_" + 
+                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".pdf");
+            
+            PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+            
             document.add(new Paragraph("🌙 Night Duty Allowance Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
             document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
-            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0; int weeklyRestCount = 0;
+            
+            double totalAllowance = 0; 
+            double totalHours = 0; 
+            int holidayCount = 0; 
+            int regularCount = 0; 
+            int weeklyRestCount = 0;
+            
             for (DutyRecord record : records) { 
                 totalAllowance += record.getNightDutyAllowance(); 
                 totalHours += record.getTotalNightHours(); 
-                if (record.isNationalHoliday()) holidayCount++; 
-                else if (record.isWeeklyRest()) weeklyRestCount++;
-                else regularCount++; 
+                if (record.isNationalHoliday() && record.isWeeklyRest()) {
+                    holidayCount++; // Count as holiday
+                } else if (record.isNationalHoliday()) {
+                    holidayCount++; 
+                } else if (record.isWeeklyRest()) {
+                    weeklyRestCount++;
+                } else {
+                    regularCount++; 
+                }
             }
+            
             document.add(new Paragraph("\nSummary:").setFontSize(16));
             document.add(new Paragraph("Total Records: " + records.size()));
             document.add(new Paragraph("Regular Days: " + regularCount));
@@ -397,20 +438,40 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             document.add(new Paragraph("Weekly Rest Days: " + weeklyRestCount));
             document.add(new Paragraph("Total Night Hours: " + String.format("%.2f hrs", totalHours)));
             document.add(new Paragraph("Total Allowance: ₹" + decimalFormat.format(totalAllowance)));
+            
             Table table = new Table(6);
-            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Allowance");
+            table.addHeaderCell("Date");
+            table.addHeaderCell("Time");
+            table.addHeaderCell("Hours");
+            table.addHeaderCell("Basic Pay");
+            table.addHeaderCell("Type");
+            table.addHeaderCell("Allowance");
+            
             Collections.sort(records, (a, b) -> b.getDate().compareTo(a.getDate()));
+            
             for (DutyRecord record : records) {
-                try { SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); Date date = inputFormat.parse(record.getDate()); table.addCell(outputFormat.format(date)); } catch (Exception e) { table.addCell(record.getDate()); }
-                table.addCell(record.getDutyFrom() + "-" + record.getDutyTo());
-                table.addCell(String.format("%.1f", record.getTotalNightHours()));
+                try {
+                    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Date date = inputFormat.parse(record.getDate());
+                    table.addCell(outputFormat.format(date));
+                } catch (Exception e) {
+                    table.addCell(record.getDate());
+                }
+                
+                table.addCell(record.getDutyFrom() + " - " + record.getDutyTo());
+                table.addCell(String.format("%.2f hrs", record.getTotalNightHours()));
                 table.addCell("₹" + decimalFormat.format(record.getEffectiveBasicPay()));
                 
                 // Determine type
                 String type = "Regular";
-                if (record.isNationalHoliday() && record.isWeeklyRest()) type = "Holiday Allowance Paid";
-                else if (record.isNationalHoliday()) type = "Holiday";
-                else if (record.isWeeklyRest()) type = "Weekly Rest";
+                if (record.isNationalHoliday() && record.isWeeklyRest()) {
+                    type = "Holiday Allowance Paid";
+                } else if (record.isNationalHoliday()) {
+                    type = "Holiday";
+                } else if (record.isWeeklyRest()) {
+                    type = "Weekly Rest";
+                }
                 table.addCell(type);
                 
                 // Display allowance in PDF
@@ -420,12 +481,33 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                     table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
                 }
             }
-            document.add(table); document.close();
-            Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
-            Intent intent = new Intent(Intent.ACTION_VIEW); intent.setDataAndType(pdfUri, "application/pdf"); intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Open PDF"));
-            Toast.makeText(this, "PDF exported: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (Exception e) { Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_LONG).show(); e.printStackTrace(); }
+            
+            document.add(table);
+            document.close();
+            
+            // Share PDF using correct FileProvider authority
+            try {
+                String authority = getApplicationContext().getPackageName() + ".provider";
+                Uri pdfUri = FileProvider.getUriForFile(this, authority, pdfFile);
+                
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Night Duty Allowance Report");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                
+                startActivity(Intent.createChooser(shareIntent, "Share Report"));
+                Toast.makeText(this, "Report exported successfully!", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                // If sharing fails, show file location
+                Toast.makeText(this, "PDF saved to: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     private void clearAllRecords() {

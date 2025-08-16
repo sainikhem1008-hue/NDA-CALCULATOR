@@ -82,7 +82,7 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
         
         btnExportLeavePDF.setOnClickListener(v -> {
             vibrate();
-            testPDFExport();
+            exportLeaveToPDF();
         });
     }
 
