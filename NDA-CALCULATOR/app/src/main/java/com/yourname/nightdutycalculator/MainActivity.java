@@ -7,12 +7,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
+
 import android.os.Vibrator;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -22,9 +21,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.yourname.nightdutycalculator.LeaveRecord;
 import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
@@ -46,8 +47,9 @@ import java.util.Locale;
 public class MainActivity extends AppCompatActivity implements RecordsAdapter.OnRecordDeleteListener {
 
     private TextInputEditText etDutyDate, etDutyFrom, etDutyTo, etCeilingLimit, etBasicPay, etDearnessAllowance;
-    private CheckBox cbNationalHoliday;
-    private Button btnCalculate, btnSave, btnExport, btnClear, btnExit;
+    private CheckBox cbNationalHoliday, cbWeeklyRest;
+    private MaterialButton btnLeaveManagement;
+    private MaterialButton btnCalculate, btnSave, btnExport, btnClear, btnExit;
     private LinearLayout llResults;
     private TextView tvCeilingWarning;
     private RecyclerView rvRecords;
@@ -73,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etBasicPay = findViewById(R.id.etBasicPay);
         etDearnessAllowance = findViewById(R.id.etDearnessAllowance);
         cbNationalHoliday = findViewById(R.id.cbNationalHoliday);
+        cbWeeklyRest = findViewById(R.id.cbWeeklyRest);
+        btnLeaveManagement = findViewById(R.id.btnLeaveManagement);
+
         btnCalculate = findViewById(R.id.btnCalculate);
         btnSave = findViewById(R.id.btnSave);
         btnExport = findViewById(R.id.btnExport);
@@ -94,9 +99,11 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         etDutyDate.setOnClickListener(v -> showDatePicker());
         etDutyFrom.setOnClickListener(v -> showTimePicker(etDutyFrom));
         etDutyTo.setOnClickListener(v -> showTimePicker(etDutyTo));
+        btnLeaveManagement.setOnClickListener(v -> { vibrate(); openLeaveManagement(); });
+
         btnCalculate.setOnClickListener(v -> { vibrate(); calculateNightDuty(); });
         btnSave.setOnClickListener(v -> { vibrate(); saveRecord(); });
-        btnExport.setOnClickListener(v -> { vibrate(); exportToPDF(); });
+        btnExport.setOnClickListener(v -> { vibrate(); testPDFExport(); });
         btnClear.setOnClickListener(v -> { vibrate(); clearAllRecords(); });
         btnExit.setOnClickListener(v -> { vibrate(); exitApp(); });
 
@@ -130,14 +137,25 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
     }
 
     private void showDatePicker() {
+        showDatePicker(etDutyDate);
+    }
+
+    private void showDatePicker(TextInputEditText editText) {
         Calendar calendar = Calendar.getInstance();
         DatePickerDialog datePickerDialog = new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             calendar.set(year, month, dayOfMonth);
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            etDutyDate.setText(sdf.format(calendar.getTime()));
+            editText.setText(sdf.format(calendar.getTime()));
         }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
         datePickerDialog.show();
     }
+
+    private void openLeaveManagement() {
+        Intent intent = new Intent(this, LeaveManagementActivity.class);
+        startActivity(intent);
+    }
+
+
 
     private void showTimePicker(TextInputEditText editText) {
         Calendar calendar = Calendar.getInstance();
@@ -157,10 +175,16 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double ceilingLimit = Double.parseDouble(etCeilingLimit.getText().toString());
             double dearnessAllowance = Double.parseDouble(etDearnessAllowance.getText().toString());
             boolean isNationalHoliday = cbNationalHoliday.isChecked();
+            boolean isWeeklyRest = cbWeeklyRest.isChecked();
 
             if (dutyDate.isEmpty() || dutyFrom.isEmpty() || dutyTo.isEmpty()) {
                 Toast.makeText(this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 return;
+            }
+
+            // Show warning if calculating for weekly rest
+            if (isWeeklyRest) {
+                Toast.makeText(this, "⚠️ Weekly Rest Day - No allowance will be calculated", Toast.LENGTH_LONG).show();
             }
 
             double effectiveBasicPay = Math.min(basicPay, ceilingLimit);
@@ -190,7 +214,63 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             double totalNightHours = nightHours1 + nightHours2;
             double nightHoursDivided = totalNightHours / 6.0;
 
-            double nightDutyAllowance = nightHoursDivided * (effectiveBasicPay * (1 + dearnessAllowance/100)) / 200;
+            // Check if duty date falls within any active leave period from leave database
+            boolean isOnLeave = false;
+            String leaveStatus = "";
+            
+            // Load leave records from separate database
+            SharedPreferences leavePrefs = getSharedPreferences("LeaveRecords", Context.MODE_PRIVATE);
+            String leaveRecordsJson = leavePrefs.getString("leave_records", "[]");
+            Type leaveListType = new TypeToken<List<LeaveRecord>>(){}.getType();
+            List<LeaveRecord> leaveRecords = gson.fromJson(leaveRecordsJson, leaveListType);
+            
+            if (leaveRecords != null && !leaveRecords.isEmpty()) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    Calendar dutyDateCal = Calendar.getInstance();
+                    
+                    dutyDateCal.setTime(sdf.parse(dutyDate));
+                    
+                    // Check each leave record
+                    for (LeaveRecord leaveRecord : leaveRecords) {
+                        if (leaveRecord.getStatus().equals("Applied") || leaveRecord.getStatus().equals("Approved")) {
+                            Calendar leaveFromCal = Calendar.getInstance();
+                            Calendar leaveToCal = Calendar.getInstance();
+                            
+                            leaveFromCal.setTime(sdf.parse(leaveRecord.getLeaveFrom()));
+                            leaveToCal.setTime(sdf.parse(leaveRecord.getLeaveTo()));
+                            
+                            // Check if duty date is within this leave period
+                            if (!dutyDateCal.before(leaveFromCal) && !dutyDateCal.after(leaveToCal)) {
+                                isOnLeave = true;
+                                leaveStatus = "📅 On Leave (" + leaveRecord.getLeaveType() + ": " + 
+                                            leaveRecord.getLeaveFrom() + " to " + leaveRecord.getLeaveTo() + ")";
+                                break; // Found matching leave period
+                            }
+                        }
+                    }
+                    
+                    if (!isOnLeave && !leaveRecords.isEmpty()) {
+                        leaveStatus = "📅 Leave Records Available";
+                    }
+                } catch (Exception e) {
+                    // If date parsing fails, assume not on leave
+                    isOnLeave = false;
+                    leaveStatus = "📅 Leave Check Error";
+                }
+            }
+
+            // Calculate night duty allowance based on conditions
+            double nightDutyAllowance = 0.0;
+            String allowanceStatus = "Calculated";
+            
+            if (isWeeklyRest) {
+                allowanceStatus = "❌ No Allowance (Weekly Rest)";
+            } else if (isOnLeave) {
+                allowanceStatus = "❌ No Allowance (On Leave)";
+            } else {
+                nightDutyAllowance = nightHoursDivided * (effectiveBasicPay * (1 + dearnessAllowance/100)) / 200;
+            }
 
             currentCalculation = new DutyRecord();
             currentCalculation.setDate(dutyDate);
@@ -205,6 +285,9 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             currentCalculation.setDearnessAllowance(dearnessAllowance);
             currentCalculation.setNightDutyAllowance(nightDutyAllowance);
             currentCalculation.setNationalHoliday(isNationalHoliday);
+            currentCalculation.setWeeklyRest(isWeeklyRest);
+            currentCalculation.setAllowanceStatus(allowanceStatus);
+            currentCalculation.setLeaveStatus(leaveStatus);
 
             displayResults();
         } catch (NumberFormatException e) {
@@ -246,13 +329,25 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         addResultItem("Night Hours (22:00-00:00):", String.format("%.2f hrs", currentCalculation.getNightHours1()));
         addResultItem("Night Hours (00:00-06:00):", String.format("%.2f hrs", currentCalculation.getNightHours2()));
         addResultItem("Total Night Hours:", String.format("%.2f hrs", currentCalculation.getTotalNightHours()));
-        addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
+        
+        // Display allowance with status
+        if (currentCalculation.getAllowanceStatus() != null && currentCalculation.getAllowanceStatus().startsWith("❌")) {
+            addResultItem("Night Allowance:", currentCalculation.getAllowanceStatus());
+        } else {
+            addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
+        }
+        
+        // Display weekly rest information
+        if (currentCalculation.isWeeklyRest()) {
+            addResultItem("Weekly Rest:", "✅ Applied");
+        }
     }
 
     private void addResultItem(String label, String value) {
         TextView tv = new TextView(this);
         tv.setText(label + " " + value);
         tv.setTextSize(16);
+        tv.setTextColor(getResources().getColor(R.color.dark_black));
         if (llResults != null) llResults.addView(tv);
     }
 
@@ -266,52 +361,153 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         Toast.makeText(this, "Record saved successfully!", Toast.LENGTH_SHORT).show();
     }
 
-    private void exportToPDF() {
-        if (records.isEmpty()) { Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show(); return; }
+    private void testPDFExport() {
         try {
-            File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String baseFileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
-            String fileName = baseFileName + ".pdf";
-            File pdfFile = new File(downloadsDir, fileName);
-            
-            // Handle existing files by adding a counter
-            int counter = 1;
-            while (pdfFile.exists()) {
-                fileName = baseFileName + "_(" + counter + ").pdf";
-                pdfFile = new File(downloadsDir, fileName);
-                counter++;
-            }
+            // Create a simple test PDF
+            File pdfFile = new File(getExternalFilesDir(null), "Test_Allowance_Report.pdf");
             
             PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
+            
+            document.add(new Paragraph("🌙 Test Night Duty Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
+            document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
+            document.add(new Paragraph("Total Records: " + records.size()));
+            
+            if (!records.isEmpty()) {
+                document.add(new Paragraph("Sample Record:"));
+                DutyRecord sample = records.get(0);
+                document.add(new Paragraph("Date: " + sample.getDate()));
+                document.add(new Paragraph("Time: " + sample.getDutyFrom() + " - " + sample.getDutyTo()));
+                document.add(new Paragraph("Hours: " + sample.getTotalNightHours()));
+                document.add(new Paragraph("Allowance: ₹" + decimalFormat.format(sample.getNightDutyAllowance())));
+            }
+            
+            document.close();
+            
+            Toast.makeText(this, "Test PDF created: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "Test PDF Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
+    private void exportToPDF() {
+        if (records.isEmpty()) {
+            Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        try {
+            // Create file in app's external files directory (no special permissions needed)
+            File pdfFile = new File(getExternalFilesDir(null), "Night_Duty_Report_" + 
+                new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".pdf");
+            
+            PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+            
             document.add(new Paragraph("🌙 Night Duty Allowance Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
             document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
-            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0;
-            for (DutyRecord record : records) { totalAllowance += record.getNightDutyAllowance(); totalHours += record.getTotalNightHours(); if (record.isNationalHoliday()) holidayCount++; else regularCount++; }
+            
+            double totalAllowance = 0; 
+            double totalHours = 0; 
+            int holidayCount = 0; 
+            int regularCount = 0; 
+            int weeklyRestCount = 0;
+            
+            for (DutyRecord record : records) { 
+                totalAllowance += record.getNightDutyAllowance(); 
+                totalHours += record.getTotalNightHours(); 
+                if (record.isNationalHoliday() && record.isWeeklyRest()) {
+                    holidayCount++; // Count as holiday
+                } else if (record.isNationalHoliday()) {
+                    holidayCount++; 
+                } else if (record.isWeeklyRest()) {
+                    weeklyRestCount++;
+                } else {
+                    regularCount++; 
+                }
+            }
+            
             document.add(new Paragraph("\nSummary:").setFontSize(16));
             document.add(new Paragraph("Total Records: " + records.size()));
             document.add(new Paragraph("Regular Days: " + regularCount));
             document.add(new Paragraph("National Holidays: " + holidayCount));
+            document.add(new Paragraph("Weekly Rest Days: " + weeklyRestCount));
             document.add(new Paragraph("Total Night Hours: " + String.format("%.2f hrs", totalHours)));
             document.add(new Paragraph("Total Allowance: ₹" + decimalFormat.format(totalAllowance)));
+            
             Table table = new Table(6);
-            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Allowance");
+            table.addHeaderCell("Date");
+            table.addHeaderCell("Time");
+            table.addHeaderCell("Hours");
+            table.addHeaderCell("Basic Pay");
+            table.addHeaderCell("Type");
+            table.addHeaderCell("Allowance");
+            
             Collections.sort(records, (a, b) -> b.getDate().compareTo(a.getDate()));
+            
             for (DutyRecord record : records) {
-                try { SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); Date date = inputFormat.parse(record.getDate()); table.addCell(outputFormat.format(date)); } catch (Exception e) { table.addCell(record.getDate()); }
-                table.addCell(record.getDutyFrom() + "-" + record.getDutyTo());
-                table.addCell(String.format("%.1f", record.getTotalNightHours()));
+                try {
+                    SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                    SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+                    Date date = inputFormat.parse(record.getDate());
+                    table.addCell(outputFormat.format(date));
+                } catch (Exception e) {
+                    table.addCell(record.getDate());
+                }
+                
+                table.addCell(record.getDutyFrom() + " - " + record.getDutyTo());
+                table.addCell(String.format("%.2f hrs", record.getTotalNightHours()));
                 table.addCell("₹" + decimalFormat.format(record.getEffectiveBasicPay()));
-                table.addCell(record.isNationalHoliday() ? "Holiday" : "Regular");
-                table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+                
+                // Determine type
+                String type = "Regular";
+                if (record.isNationalHoliday() && record.isWeeklyRest()) {
+                    type = "Holiday Allowance Paid";
+                } else if (record.isNationalHoliday()) {
+                    type = "Holiday";
+                } else if (record.isWeeklyRest()) {
+                    type = "Weekly Rest";
+                }
+                table.addCell(type);
+                
+                // Display allowance in PDF
+                if (record.getAllowanceStatus() != null && record.getAllowanceStatus().startsWith("❌")) {
+                    table.addCell(record.getAllowanceStatus().replace("❌ ", ""));
+                } else {
+                    table.addCell("₹" + decimalFormat.format(record.getNightDutyAllowance()));
+                }
             }
-            document.add(table); document.close();
-            Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
-            Intent intent = new Intent(Intent.ACTION_VIEW); intent.setDataAndType(pdfUri, "application/pdf"); intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(intent, "Open PDF"));
-            Toast.makeText(this, "PDF exported: " + fileName, Toast.LENGTH_LONG).show();
-        } catch (Exception e) { Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_LONG).show(); e.printStackTrace(); }
+            
+            document.add(table);
+            document.close();
+            
+            // Share PDF using correct FileProvider authority
+            try {
+                String authority = getApplicationContext().getPackageName() + ".provider";
+                Uri pdfUri = FileProvider.getUriForFile(this, authority, pdfFile);
+                
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Night Duty Allowance Report");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                
+                startActivity(Intent.createChooser(shareIntent, "Share Report"));
+                Toast.makeText(this, "Report exported successfully!", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                // If sharing fails, show file location
+                Toast.makeText(this, "PDF saved to: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     private void clearAllRecords() {
