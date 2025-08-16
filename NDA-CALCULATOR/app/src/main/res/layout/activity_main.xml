@@ -16,12 +16,12 @@
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
             app:cardElevation="4dp"
-            app:cardBackgroundColor="@color/light_blue">
+            app:cardBackgroundColor="@color/header_blue">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/light_blue"
+                android:background="@color/header_blue"
                 android:orientation="vertical"
                 android:padding="20dp">
 
@@ -131,7 +131,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@color/primary_blue"
+                android:background="@color/header_blue"
                 android:text="💾 Save"
                 android:textColor="@color/white" />
 
@@ -141,7 +141,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:background="@color/accent_orange"
+                android:background="@color/header_blue"
                 android:text="📄 Export PDF"
                 android:textColor="@color/white" />
 
@@ -159,7 +159,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:background="@color/accent_red"
+                android:background="@color/header_blue"
                 android:text="🗑️ Clear All"
                 android:textColor="@color/white" />
 
@@ -169,7 +169,7 @@
                 android:layout_weight="1"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
-                android:background="@color/primary_dark"
+                android:background="@color/header_blue"
                 android:text="🚪 Exit"
                 android:textColor="@color/white" />
 
