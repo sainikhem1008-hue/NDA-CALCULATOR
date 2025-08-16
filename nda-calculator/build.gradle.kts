@@ -1,0 +1,1 @@
+// Root build.gradle.kts intentionally minimal; repositories are defined in settings.gradle.kts
