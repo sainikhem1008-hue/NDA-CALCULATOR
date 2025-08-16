@@ -270,8 +270,18 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
         if (records.isEmpty()) { Toast.makeText(this, "No records to export", Toast.LENGTH_SHORT).show(); return; }
         try {
             File downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-            String fileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date()) + ".pdf";
+            String baseFileName = "Night_Duty_Report_" + new SimpleDateFormat("yyyy_MM_dd", Locale.getDefault()).format(new Date());
+            String fileName = baseFileName + ".pdf";
             File pdfFile = new File(downloadsDir, fileName);
+            
+            // Handle existing files by adding a counter
+            int counter = 1;
+            while (pdfFile.exists()) {
+                fileName = baseFileName + "_(" + counter + ").pdf";
+                pdfFile = new File(downloadsDir, fileName);
+                counter++;
+            }
+            
             PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
@@ -300,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             Uri pdfUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", pdfFile);
             Intent intent = new Intent(Intent.ACTION_VIEW); intent.setDataAndType(pdfUri, "application/pdf"); intent.setFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             startActivity(Intent.createChooser(intent, "Open PDF"));
-            Toast.makeText(this, "PDF exported to Downloads folder", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "PDF exported: " + fileName, Toast.LENGTH_LONG).show();
         } catch (Exception e) { Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_LONG).show(); e.printStackTrace(); }
     }
 

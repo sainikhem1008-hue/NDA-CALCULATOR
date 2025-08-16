@@ -15,12 +15,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="@color/light_blue">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/primary_blue"
+                android:background="@color/light_blue"
                 android:orientation="vertical"
                 android:padding="20dp">
 
@@ -29,7 +30,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="🌙 Night Duty Calculator"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="24sp"
                     android:textStyle="bold" />
 
@@ -38,7 +39,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Calculate and track your allowances"
-                    android:textColor="@color/white"
+                    android:textColor="@color/black"
                     android:textSize="14sp"
                     android:layout_marginTop="8dp" />
 
@@ -48,6 +49,7 @@
 
         <!-- simplified input fields -->
         <com.google.android.material.textfield.TextInputLayout
+            style="@style/CustomTextInputLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="12dp"
@@ -59,31 +61,58 @@
                 android:focusable="false"
                 android:inputType="none"
                 android:textColor="@color/black"
-                android:textColorHint="@color/dark_gray" />
+                android:textColorHint="@color/black" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
-            <com.google.android.material.textfield.TextInputLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="@string/duty_from">
-                <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDutyFrom" android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="false" android:inputType="none" android:textColor="@color/black" android:textColorHint="@color/dark_gray"/>
-            </com.google.android.material.textfield.TextInputLayout>
-            <com.google.android.material.textfield.TextInputLayout android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:hint="@string/duty_to">
-                                  <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDutyTo" android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="false" android:inputType="none" android:textColor="@color/black" android:textColorHint="@color/dark_gray"/>
-            </com.google.android.material.textfield.TextInputLayout>
-        </LinearLayout>
+                  <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal">
+              <com.google.android.material.textfield.TextInputLayout 
+                  style="@style/CustomTextInputLayout"
+                  android:layout_width="0dp" 
+                  android:layout_weight="1" 
+                  android:layout_height="wrap_content" 
+                  android:hint="@string/duty_from"
+                  android:layout_marginEnd="8dp">
+                  <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDutyFrom" android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="false" android:inputType="none" android:textColor="@color/black" android:textColorHint="@color/black"/>
+              </com.google.android.material.textfield.TextInputLayout>
+              <com.google.android.material.textfield.TextInputLayout 
+                  style="@style/CustomTextInputLayout"
+                  android:layout_width="0dp" 
+                  android:layout_weight="1" 
+                  android:layout_height="wrap_content" 
+                  android:hint="@string/duty_to"
+                  android:layout_marginStart="8dp">
+                  <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDutyTo" android:layout_width="match_parent" android:layout_height="wrap_content" android:focusable="false" android:inputType="none" android:textColor="@color/black" android:textColorHint="@color/black"/>
+              </com.google.android.material.textfield.TextInputLayout>
+          </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/ceiling_limit">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCeilingLimit" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" android:textColor="@color/black" android:textColorHint="@color/dark_gray" />
-        </com.google.android.material.textfield.TextInputLayout>
+                  <com.google.android.material.textfield.TextInputLayout 
+              style="@style/CustomTextInputLayout"
+              android:layout_width="match_parent" 
+              android:layout_height="wrap_content" 
+              android:hint="@string/ceiling_limit"
+              android:layout_marginBottom="12dp">
+              <com.google.android.material.textfield.TextInputEditText android:id="@+id/etCeilingLimit" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" android:textColor="@color/black" android:textColorHint="@color/black" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/basic_pay">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBasicPay" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" android:textColor="@color/black" android:textColorHint="@color/dark_gray" />
-        </com.google.android.material.textfield.TextInputLayout>
+          <com.google.android.material.textfield.TextInputLayout 
+              style="@style/CustomTextInputLayout"
+              android:layout_width="match_parent" 
+              android:layout_height="wrap_content" 
+              android:hint="@string/basic_pay"
+              android:layout_marginBottom="12dp">
+              <com.google.android.material.textfield.TextInputEditText android:id="@+id/etBasicPay" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="number" android:text="43600" android:textColor="@color/black" android:textColorHint="@color/black" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <com.google.android.material.textfield.TextInputLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:hint="@string/dearness_allowance">
-            <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="55.0" android:textColor="@color/black" android:textColorHint="@color/dark_gray" />
-        </com.google.android.material.textfield.TextInputLayout>
+          <com.google.android.material.textfield.TextInputLayout 
+              style="@style/CustomTextInputLayout"
+              android:layout_width="match_parent" 
+              android:layout_height="wrap_content" 
+              android:hint="@string/dearness_allowance"
+              android:layout_marginBottom="12dp">
+              <com.google.android.material.textfield.TextInputEditText android:id="@+id/etDearnessAllowance" android:layout_width="match_parent" android:layout_height="wrap_content" android:inputType="numberDecimal" android:text="55.0" android:textColor="@color/black" android:textColorHint="@color/black" />
+          </com.google.android.material.textfield.TextInputLayout>
 
-        <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/accent_orange" android:textStyle="bold" android:layout_marginBottom="16dp" />
+                  <CheckBox android:id="@+id/cbNationalHoliday" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="🎉 National Holiday" android:textSize="16sp" android:textColor="@color/black" android:textStyle="bold" android:layout_marginBottom="16dp" />
 
         <Button android:id="@+id/btnCalculate" android:layout_width="match_parent" android:layout_height="56dp" android:background="@color/accent_green" android:text="🧮 Calculate Allowance" android:textColor="@color/white" android:textSize="16sp" android:textStyle="bold" />
 

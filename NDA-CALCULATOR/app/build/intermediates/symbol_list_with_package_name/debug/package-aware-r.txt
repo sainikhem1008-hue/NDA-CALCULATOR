@@ -1371,6 +1371,8 @@ color foreground_material_light
 color highlighted_text_material_dark
 color highlighted_text_material_light
 color ic_launcher_background
+color light_blue
+color light_blue_border
 color light_gray
 color light_green
 color m3_appbar_overlay_color
@@ -3966,6 +3968,7 @@ style Base_Widget_MaterialComponents_TextView
 style CardView
 style CardView_Dark
 style CardView_Light
+style CustomTextInputLayout
 style MaterialAlertDialog_Material3
 style MaterialAlertDialog_Material3_Animation
 style MaterialAlertDialog_Material3_Body_Text

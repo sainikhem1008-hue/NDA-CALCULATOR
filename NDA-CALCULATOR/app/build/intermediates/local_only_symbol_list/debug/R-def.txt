@@ -7,6 +7,8 @@ color black
 color border_gray
 color dark_gray
 color ic_launcher_background
+color light_blue
+color light_blue_border
 color light_gray
 color light_green
 color primary_blue
@@ -56,6 +58,7 @@ string night_hours_22_00
 string save_record
 string total_duty_hours
 string total_night_hours
+style CustomTextInputLayout
 style Theme.Material3.DayNight
 xml backup_rules
 xml data_extraction_rules
