@@ -231,15 +231,8 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 try {
                     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
                     Calendar dutyDateCal = Calendar.getInstance();
-                    Calendar todayCal = Calendar.getInstance();
                     
                     dutyDateCal.setTime(sdf.parse(dutyDate));
-                    
-                    // Set today's date to start of day for comparison
-                    todayCal.set(Calendar.HOUR_OF_DAY, 0);
-                    todayCal.set(Calendar.MINUTE, 0);
-                    todayCal.set(Calendar.SECOND, 0);
-                    todayCal.set(Calendar.MILLISECOND, 0);
                     
                     // Check each leave record
                     for (LeaveRecord leaveRecord : leaveRecords) {
@@ -347,13 +340,9 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             addResultItem("Night Allowance:", "₹" + decimalFormat.format(currentCalculation.getNightDutyAllowance()));
         }
         
-        // Display weekly rest and leave information if available
+        // Display weekly rest information
         if (currentCalculation.isWeeklyRest()) {
             addResultItem("Weekly Rest:", "✅ Applied");
-        }
-        
-        if (currentCalculation.getLeaveStatus() != null && !currentCalculation.getLeaveStatus().isEmpty()) {
-            addResultItem("Leave Status:", currentCalculation.getLeaveStatus());
         }
     }
 
@@ -396,25 +385,23 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
             Document document = new Document(pdfDoc);
             document.add(new Paragraph("🌙 Night Duty Allowance Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
             document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
-            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0; int weeklyRestCount = 0; int leaveCount = 0;
+            double totalAllowance = 0; double totalHours = 0; int holidayCount = 0; int regularCount = 0; int weeklyRestCount = 0;
             for (DutyRecord record : records) { 
                 totalAllowance += record.getNightDutyAllowance(); 
                 totalHours += record.getTotalNightHours(); 
                 if (record.isNationalHoliday()) holidayCount++; 
                 else if (record.isWeeklyRest()) weeklyRestCount++;
                 else regularCount++; 
-                if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) leaveCount++;
             }
             document.add(new Paragraph("\nSummary:").setFontSize(16));
             document.add(new Paragraph("Total Records: " + records.size()));
             document.add(new Paragraph("Regular Days: " + regularCount));
             document.add(new Paragraph("National Holidays: " + holidayCount));
             document.add(new Paragraph("Weekly Rest Days: " + weeklyRestCount));
-            document.add(new Paragraph("Leave Records: " + leaveCount));
             document.add(new Paragraph("Total Night Hours: " + String.format("%.2f hrs", totalHours)));
             document.add(new Paragraph("Total Allowance: ₹" + decimalFormat.format(totalAllowance)));
-            Table table = new Table(7);
-            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Leave Info"); table.addHeaderCell("Allowance");
+            Table table = new Table(6);
+            table.addHeaderCell("Date"); table.addHeaderCell("Time"); table.addHeaderCell("Hours"); table.addHeaderCell("Basic Pay"); table.addHeaderCell("Type"); table.addHeaderCell("Allowance");
             Collections.sort(records, (a, b) -> b.getDate().compareTo(a.getDate()));
             for (DutyRecord record : records) {
                 try { SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); SimpleDateFormat outputFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()); Date date = inputFormat.parse(record.getDate()); table.addCell(outputFormat.format(date)); } catch (Exception e) { table.addCell(record.getDate()); }
@@ -427,13 +414,6 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 if (record.isNationalHoliday()) type = "Holiday";
                 else if (record.isWeeklyRest()) type = "Weekly Rest";
                 table.addCell(type);
-                
-                // Leave information
-                String leaveInfo = "";
-                if (record.getLeaveStatus() != null && !record.getLeaveStatus().isEmpty()) {
-                    leaveInfo = record.getLeaveStatus().replace("📅 ", "");
-                }
-                table.addCell(leaveInfo);
                 
                 // Display allowance in PDF
                 if (record.getAllowanceStatus() != null && record.getAllowanceStatus().startsWith("❌")) {

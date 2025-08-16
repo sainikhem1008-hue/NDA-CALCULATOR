@@ -108,21 +108,6 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
             return;
         }
 
-        // Validate date range
-        try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
-            Date fromDate = sdf.parse(leaveFrom);
-            Date toDate = sdf.parse(leaveTo);
-            
-            if (toDate.before(fromDate)) {
-                Toast.makeText(this, "Leave end date cannot be before start date", Toast.LENGTH_SHORT).show();
-                return;
-            }
-        } catch (Exception e) {
-            Toast.makeText(this, "Invalid date format", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         // Create new leave record
         LeaveRecord leaveRecord = new LeaveRecord();
         leaveRecord.setLeaveFrom(leaveFrom);

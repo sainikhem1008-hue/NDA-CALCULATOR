@@ -56,22 +56,7 @@ public class LeaveRecordsAdapter extends RecyclerView.Adapter<LeaveRecordsAdapte
         
         // Set status with color
         holder.tvLeaveStatus.setText(record.getStatus());
-        switch (record.getStatus()) {
-            case "Applied":
-                holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#4CAF50")); // Green
-                break;
-            case "Approved":
-                holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#2196F3")); // Blue
-                break;
-            case "Rejected":
-                holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#f44336")); // Red
-                break;
-            case "Completed":
-                holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#9E9E9E")); // Gray
-                break;
-            default:
-                holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#4CAF50")); // Default green
-        }
+        holder.tvLeaveStatus.setBackgroundColor(Color.parseColor("#4CAF50")); // Green
         
         // Show notes if available
         if (record.getNotes() != null && !record.getNotes().isEmpty()) {

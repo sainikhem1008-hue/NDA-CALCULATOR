@@ -43,38 +43,22 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         holder.tvHours.setText(String.format("%.1f hrs", record.getTotalNightHours()));
         
         // Determine type text based on various conditions
-        StringBuilder typeText = new StringBuilder();
+        String typeText;
         if (record.isNationalHoliday()) {
-            typeText.append("🎉 Holiday");
+            typeText = "🎉 Holiday";
         } else if (record.isWeeklyRest()) {
-            typeText.append("🌅 Weekly Rest");
+            typeText = "🌅 Weekly Rest";
         } else {
-            typeText.append("📅 Regular");
+            typeText = "📅 Regular";
         }
         
-        // Add leave status if available
-        if (record.getLeaveStatus() != null && !record.getLeaveStatus().isEmpty()) {
-            if (typeText.length() > 0) typeText.append(" | ");
-            if (record.getLeaveStatus().contains("Currently On Leave")) {
-                typeText.append("📅 On Leave");
-            } else if (record.getLeaveStatus().contains("Leave Applied")) {
-                typeText.append("📅 Leave Applied");
-            } else if (record.getLeaveStatus().contains("Leave Completed")) {
-                typeText.append("📅 Leave Completed");
-            } else {
-                typeText.append("📅 Leave Active");
-            }
-        }
-        
-        holder.tvType.setText(typeText.toString());
+        holder.tvType.setText(typeText);
         
         // Set color based on type
         if (record.isNationalHoliday()) {
             holder.tvType.setTextColor(Color.parseColor("#f39c12")); // orange
         } else if (record.isWeeklyRest()) {
             holder.tvType.setTextColor(Color.parseColor("#4CAF50")); // green
-        } else if (record.getLeaveFrom() != null && !record.getLeaveFrom().isEmpty()) {
-            holder.tvType.setTextColor(Color.parseColor("#2196F3")); // blue
         } else {
             holder.tvType.setTextColor(Color.BLACK);
         }
