@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      ANDROID_SDK_ROOT: $HOME/android-sdk
-      ANDROID_HOME: $HOME/android-sdk
-
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
@@ -24,32 +20,12 @@ jobs:
         distribution: temurin
         java-version: 17
 
-    - name: Install Android SDK Command-line Tools (fixed structure)
-      run: |
-        set -e
-        echo "Installing Android cmdline-tools..."
-        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
-        curl -sLo /tmp/cmdtools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-
-        # Create 'latest' dir and unzip directly into it
-        mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-        unzip -q /tmp/cmdtools.zip -d "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-
-        # If Google nested it under cmdline-tools/, flatten it
-        if [ -d "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools" ]; then
-          mv "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"/* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
-          rm -rf "$ANDROID_SDK_ROOT/cmdline-tools/latest/cmdline-tools"
-        fi
-
-        echo "Checking sdkmanager works..."
-        "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --version
-
-        yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
-        yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platform-tools" "platforms;android-34" "build-tools;34.0.0"
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
 
     - name: Create local.properties
       working-directory: NDA-CALCULATOR
-      run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+      run: echo "sdk.dir=$ANDROID_HOME" > local.properties
 
     - name: Make gradlew executable
       run: chmod +x ./NDA-CALCULATOR/gradlew
@@ -62,14 +38,12 @@ jobs:
 
     - name: Build APK
       working-directory: NDA-CALCULATOR
-      env:
-        ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
-        ANDROID_HOME: ${{ env.ANDROID_SDK_ROOT }}
       run: ./gradlew clean :app:assembleDebug --no-daemon --stacktrace --info --warning-mode all
 
     - name: Copy debug APK to canonical path (compat)
       run: |
         set -e
+        # Prefer unsigned or regular debug APK if present
         found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | grep -E 'app-debug.*\.apk$' | head -n 1 || true)
         if [ -z "$found" ]; then
           found=$(ls -1 NDA-CALCULATOR/app/build/outputs/apk/debug/*.apk 2>/dev/null | head -n 1 || true)
