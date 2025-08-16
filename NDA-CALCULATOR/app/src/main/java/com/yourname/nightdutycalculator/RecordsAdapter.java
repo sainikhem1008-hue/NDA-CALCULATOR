@@ -45,7 +45,7 @@ public class RecordsAdapter extends RecyclerView.Adapter<RecordsAdapter.ViewHold
         // Determine type text based on various conditions
         String typeText;
         if (record.isNationalHoliday() && record.isWeeklyRest()) {
-            typeText = "🌅 Rest + Holiday";
+            typeText = "🎉 Holiday Allowance Paid";
         } else if (record.isNationalHoliday()) {
             typeText = "🎉 Holiday";
         } else if (record.isWeeklyRest()) {

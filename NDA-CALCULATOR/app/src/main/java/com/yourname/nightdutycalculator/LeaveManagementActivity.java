@@ -82,7 +82,7 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
         
         btnExportLeavePDF.setOnClickListener(v -> {
             vibrate();
-            exportLeaveToPDF();
+            testPDFExport();
         });
     }
 
@@ -182,6 +182,38 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
             .show();
     }
 
+    private void testPDFExport() {
+        try {
+            // Create a simple test PDF
+            File pdfFile = new File(getExternalFilesDir(null), "Test_Leave_Report.pdf");
+            
+            PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
+            PdfDocument pdfDoc = new PdfDocument(writer);
+            Document document = new Document(pdfDoc);
+            
+            document.add(new Paragraph("📅 Leave Management Test Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
+            document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
+            document.add(new Paragraph("Total Leave Records: " + leaveRecords.size()));
+            
+            if (!leaveRecords.isEmpty()) {
+                document.add(new Paragraph("Sample Record:"));
+                LeaveRecord sample = leaveRecords.get(0);
+                document.add(new Paragraph("From: " + sample.getLeaveFrom()));
+                document.add(new Paragraph("To: " + sample.getLeaveTo()));
+                document.add(new Paragraph("Type: " + sample.getLeaveType()));
+                document.add(new Paragraph("Status: " + sample.getStatus()));
+            }
+            
+            document.close();
+            
+            Toast.makeText(this, "Test PDF created: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            
+        } catch (Exception e) {
+            Toast.makeText(this, "Test PDF Error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
+    }
+
     private void exportLeaveToPDF() {
         if (leaveRecords.isEmpty()) {
             Toast.makeText(this, "No leave records to export", Toast.LENGTH_SHORT).show();
@@ -189,17 +221,20 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
         }
 
         try {
+            // Create file in app's external files directory
             File pdfFile = new File(getExternalFilesDir(null), "Leave_Records_" + 
                 new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date()) + ".pdf");
             
+            // Create PDF
             PdfWriter writer = new PdfWriter(new FileOutputStream(pdfFile));
             PdfDocument pdfDoc = new PdfDocument(writer);
             Document document = new Document(pdfDoc);
             
+            // Add header
             document.add(new Paragraph("📅 Leave Management Report").setTextAlignment(TextAlignment.CENTER).setFontSize(20));
             document.add(new Paragraph("Generated on: " + new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(new Date())).setTextAlignment(TextAlignment.CENTER).setFontSize(12));
             
-            // Summary
+            // Calculate summary
             int appliedCount = 0, approvedCount = 0, rejectedCount = 0, completedCount = 0;
             for (LeaveRecord record : leaveRecords) {
                 switch (record.getStatus()) {
@@ -210,6 +245,7 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
                 }
             }
             
+            // Add summary
             document.add(new Paragraph("\nSummary:").setFontSize(16));
             document.add(new Paragraph("Total Applications: " + leaveRecords.size()));
             document.add(new Paragraph("Applied: " + appliedCount));
@@ -217,7 +253,7 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
             document.add(new Paragraph("Rejected: " + rejectedCount));
             document.add(new Paragraph("Completed: " + completedCount));
             
-            // Table
+            // Create table
             Table table = new Table(5);
             table.addHeaderCell("Leave Period");
             table.addHeaderCell("Type");
@@ -225,8 +261,10 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
             table.addHeaderCell("Applied Date");
             table.addHeaderCell("Notes");
             
+            // Sort records by applied date (newest first)
             Collections.sort(leaveRecords, (a, b) -> b.getAppliedDate().compareTo(a.getAppliedDate()));
             
+            // Add records to table
             for (LeaveRecord record : leaveRecords) {
                 try {
                     SimpleDateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
@@ -243,6 +281,7 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
                     table.addCell(outputFormat.format(appliedDate));
                     table.addCell(record.getNotes() != null ? record.getNotes() : "");
                 } catch (Exception e) {
+                    // Fallback if date parsing fails
                     table.addCell(record.getLeaveFrom() + " to " + record.getLeaveTo());
                     table.addCell(record.getLeaveType());
                     table.addCell(record.getStatus());
@@ -254,19 +293,28 @@ public class LeaveManagementActivity extends AppCompatActivity implements LeaveR
             document.add(table);
             document.close();
             
-            // Share PDF
-            Uri pdfUri = FileProvider.getUriForFile(this, getApplicationContext().getPackageName() + ".provider", pdfFile);
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("application/pdf");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
-            shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Leave Management Report");
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            
-            startActivity(Intent.createChooser(shareIntent, "Share Leave Report"));
-            Toast.makeText(this, "Leave report exported successfully!", Toast.LENGTH_SHORT).show();
+            // Share the PDF
+            try {
+                String authority = getApplicationContext().getPackageName() + ".provider";
+                Uri pdfUri = FileProvider.getUriForFile(this, authority, pdfFile);
+                
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("application/pdf");
+                shareIntent.putExtra(Intent.EXTRA_STREAM, pdfUri);
+                shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Leave Management Report");
+                shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                
+                startActivity(Intent.createChooser(shareIntent, "Share Leave Report"));
+                Toast.makeText(this, "Leave report exported successfully!", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                // If sharing fails, show file location
+                Toast.makeText(this, "PDF saved to: " + pdfFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                e.printStackTrace();
+            }
             
         } catch (Exception e) {
             Toast.makeText(this, "Error exporting PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 

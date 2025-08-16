@@ -408,7 +408,7 @@ public class MainActivity extends AppCompatActivity implements RecordsAdapter.On
                 
                 // Determine type
                 String type = "Regular";
-                if (record.isNationalHoliday() && record.isWeeklyRest()) type = "Rest + Holiday";
+                if (record.isNationalHoliday() && record.isWeeklyRest()) type = "Holiday Allowance Paid";
                 else if (record.isNationalHoliday()) type = "Holiday";
                 else if (record.isWeeklyRest()) type = "Weekly Rest";
                 table.addCell(type);
